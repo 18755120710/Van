@@ -360,7 +360,8 @@ export default {
                         text: "",
                         streaming: true,
                         toolResults: [],
-                        showTools: true
+                        showTools: true,
+                        isError: false
                     };
                     this.messages.push(existingMsg);
                 }
@@ -376,8 +377,27 @@ export default {
                     existingMsg.openUrl = message.openUrl;
                 }
 
-                // 2. 当 message.trace === true 时，追加到执行步骤面板中
-                if (message.trace === true) {
+                // 2. 处理 eventType === "answer_delta" 流式响应片段
+                if (message.eventType === 'answer_delta') {
+                    existingMsg.text = (existingMsg.text || '') + (message.text || '');
+                    existingMsg.streaming = true;
+                }
+
+                // 3. 处理 eventType === "answer" 最终回答信号
+                else if (message.eventType === 'answer') {
+                    if (message.text) {
+                        if (!existingMsg.text) {
+                            existingMsg.text = message.text;
+                        }
+                    }
+                    existingMsg.streaming = false;
+                    if (message.done === true) {
+                        this.disableInput = false;
+                    }
+                }
+
+                // 4. 处理 message.trace === true 且 eventType !== "error" 的执行轨迹消息
+                else if (message.trace === true && message.eventType !== 'error') {
                     existingMsg.toolResults.push({
                         eventType: message.eventType,
                         agentName: message.agentName,
@@ -391,30 +411,24 @@ export default {
                     }
                 }
 
-                // 3. 当 message.eventType === "answer" 时，设置为 server 消息的最终回答正文
-                if (message.eventType === 'answer') {
-                    existingMsg.text = message.text || "";
-                    existingMsg.streaming = false;
-                    if (message.done === true) {
-                        this.disableInput = false;
+                // 5. 处理 eventType === "error" 错误轨迹，且避免重复追加
+                else if (message.eventType === 'error') {
+                    const isAlreadyAdded = existingMsg.toolResults.some(t => t.eventType === 'error' && t.text === message.text);
+                    if (!isAlreadyAdded) {
+                        existingMsg.toolResults.push({
+                            eventType: message.eventType,
+                            agentName: message.agentName,
+                            toolName: message.toolName,
+                            text: message.text || "",
+                            timestamp: this.getFormattedTime()
+                        });
                     }
-                }
-
-                // 4. 当 message.eventType === "error" 时，追加到 toolResults 并标记错误状态，同时恢复输入框
-                if (message.eventType === 'error') {
-                    existingMsg.toolResults.push({
-                        eventType: message.eventType,
-                        agentName: message.agentName,
-                        toolName: message.toolName,
-                        text: message.text || "",
-                        timestamp: this.getFormattedTime()
-                    });
                     existingMsg.isError = true;
                     existingMsg.streaming = false;
                     this.disableInput = false;
                 }
 
-                // 5. 如果 done 为 true
+                // 6. 如果 message.done === true，则更新状态并恢复输入框
                 if (message.done === true) {
                     existingMsg.streaming = false;
                     this.disableInput = false;
@@ -422,7 +436,7 @@ export default {
 
                 this.scrollToBottom();
             } else {
-                // 6. 保留旧消息兼容逻辑：如果没有 traceId，但有 text，按原来的方式 push 到 messages
+                // 7. 保留旧消息兼容逻辑：如果没有 traceId，但有 text，按原来的方式 push 到 messages
                 if (message.text) {
                     this.messages.push(message);
                     this.scrollToBottom();
@@ -444,6 +458,7 @@ export default {
                 case 'tool_result': return '工具结果';
                 case 'status': return '状态更新';
                 case 'error': return '异常错误';
+                case 'summary': return '执行摘要';
                 case 'answer': return '最终回答';
                 default: return eventType || '执行步骤';
             }
@@ -1863,6 +1878,7 @@ export default {
 .tool-dot.tool_result { background: #10b981; } /* Emerald */
 .tool-dot.error { background: #ef4444; } /* Red */
 .tool-dot.status { background: #6b7280; } /* Gray */
+.tool-dot.summary { background: #14b8a6; } /* Teal */
 
 .tool-badge {
   font-size: 0.65rem;
@@ -1878,6 +1894,7 @@ export default {
 .tool-badge.tool_result { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
 .tool-badge.error { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 .tool-badge.status { background: rgba(107, 114, 128, 0.15); color: #9ca3af; border: 1px solid rgba(107, 114, 128, 0.3); }
+.tool-badge.summary { background: rgba(20, 184, 166, 0.15); color: #2dd4bf; border: 1px solid rgba(20, 184, 166, 0.3); }
 
 .tool-agent, .tool-name-text {
   font-size: 0.7rem;
