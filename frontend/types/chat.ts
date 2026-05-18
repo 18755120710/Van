@@ -17,6 +17,7 @@ export interface Message {
   toolResults?: ToolResult[];
   showTools?: boolean;
   isError?: boolean;
+  stopped?: boolean;
 }
 
 export interface DialogMessageDTO {
