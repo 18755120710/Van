@@ -410,9 +410,6 @@ export default {
                 if (message.eventType === 'answer_delta') {
                     existingMsg.text = (existingMsg.text || '') + (message.text || '');
                     existingMsg.streaming = true;
-                    this.activeTraceMsgId = message.traceId;
-                    this.isRightPanelOpen = true;
-                    this.scrollToRightPanelBottom();
                 }
 
                 // 3. 处理 eventType === "answer" 最终回答信号
