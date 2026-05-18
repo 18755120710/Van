@@ -9,7 +9,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class AgentExecutorConfig {
 
     @Bean
-    public TaskExecutor agentTaskExecutor() {
+    public ThreadPoolTaskExecutor agentTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
         executor.setCorePoolSize(4);// 核心线程数

@@ -21,52 +21,84 @@ public class DialogMessageDTO {
     private String openUrl;
 
     /**
-     * 同一次 Agent 回复的唯一 ID。
+     * 本次用户提问对应的一次 Agent 执行 ID。
      *
-     * 为什么需要它？
-     * 流式输出时，后端会连续发送很多条 WebSocket 消息：
-     * chunk1、chunk2、chunk3、最终结果……
+     * 一次用户问题会产生多条过程消息：
+     * - 规划开始
+     * - 规划步骤
+     * - 调用 BrowserAgent
+     * - BrowserAgent 打开网页
+     * - BrowserAgent 提取内容
+     * - 最终回答
      *
-     * 前端需要靠 streamId 判断：
-     * “这些片段是不是属于同一条 Agent 回复？”
-     *
-     * 如果没有 streamId，前端只能每收到一个 chunk 就新增一条消息，
-     * 页面会变成很多碎片消息。
+     * 这些消息都使用同一个 traceId，前端可以把它们归为同一轮执行。
      */
-    private String streamId;
+    private String traceId;
 
     /**
-     * AgentScope stream 事件类型。
+     * 前端展示类型。
      *
-     * 常见值包括：
-     * REASONING    模型推理/生成过程
-     * TOOL_RESULT  工具调用结果，例如 use_browser_agent、create_plan
-     * SUMMARY      达到最大轮次时的总结
-     * AGENT_RESULT 最终回复
-     *
-     * 前端可以根据 eventType 决定：
-     * - 普通聊天区只展示 REASONING / AGENT_RESULT
-     * - 调试面板展示 TOOL_RESULT
-     * - 计划面板展示 create_plan / finish_subtask 等工具结果
+     * 建议值：
+     * status      状态提示，例如“正在规划步骤”
+     * plan        规划步骤
+     * agent_call  调用了哪个子 Agent
+     * tool_call   调用了哪个工具
+     * tool_result 工具返回结果
+     * answer      最终回答
+     * error       错误信息
      */
     private String eventType;
 
     /**
-     * 是否是流式输出过程中的消息。
+     * 当前事件来自哪个 Agent。
      *
-     * true  表示这条消息是中间片段
-     * false 表示不是流式消息，或者已经是普通完整消息
+     * 例如：
+     * PlannerAgent
+     * BrowserAgent
      */
-    private Boolean streaming;
+    private String agentName;
 
     /**
-     * 当前这一次 Agent 回复是否已经结束。
+     * 当前调用的工具名。
      *
-     * true 表示这次 stream 已经结束，前端可以：
-     * - 停止 loading
-     * - 恢复输入框
-     * - 把消息状态改成完成
+     * 例如：
+     * create_plan
+     * use_browser_agent
+     * go_to_url
+     * extract_content
      */
-    private Boolean streamEnd;
+    private String toolName;
+
+    /**
+     * 是否是中间过程消息。
+     *
+     * true 表示这条消息只是执行过程，
+     * false 表示这条消息可以当作正式回答。
+     */
+    private Boolean trace;
+
+    /**
+     * 当前这一轮 Agent 执行是否结束。
+     *
+     * 前端可以根据它恢复输入框。
+     */
+    private Boolean done;
+
+    /**
+     * 客户端动作类型。
+     *
+     * chat:
+     *   普通用户提问。
+     *
+     * stop:
+     *   停止当前正在运行的 Agent。
+     *
+     * 为什么需要这个字段？
+     *
+     * 因为 stop 指令可能没有 text。
+     * 如果只靠 text 判断，后端会把空文本 stop 消息过滤掉。
+     */
+    private String action;
+
 
 }

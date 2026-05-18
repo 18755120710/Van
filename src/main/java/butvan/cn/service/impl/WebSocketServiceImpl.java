@@ -1,15 +1,23 @@
 package butvan.cn.service.impl;
 
+import butvan.cn.agent.browser.runtime.AgentExecutionHandle;
+import butvan.cn.agent.browser.runtime.AgentExecutionRegistry;
 import butvan.cn.agent.service.AgentRunService;
+import butvan.cn.common.security.SessionIdSanitizer;
 import butvan.cn.service.WebSocketService;
 import butvan.cn.websocket.dto.DialogMessageDTO;
+import butvan.cn.websocket.session.MessageSession;
 import butvan.cn.websocket.session.WebSocketSessionManager;
 import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+import java.util.concurrent.Future;
 
 @Slf4j
 @Service
@@ -21,27 +29,49 @@ public class WebSocketServiceImpl implements WebSocketService
 
     private final AgentRunService agentRunService;
 
-    private final TaskExecutor agentTaskExecutor;// 注入 agent 专用线程数
+    private final ThreadPoolTaskExecutor agentTaskExecutor;// 注入 agent 专用线程数
+
+    private final AgentExecutionRegistry agentExecutionRegistry;
 
 
     @Override
     public void enhancedDialog(DialogMessageDTO message, SimpMessageHeaderAccessor headerAccessor) {
-        if (StrUtil.isEmpty(message.getText())) {
-            log.info("receive message empty!!!");
+
+        String session_id = SessionIdSanitizer.requireSafe(headerAccessor.getSessionId());
+
+        MessageSession ws_session = this.sessionManager.getSession(session_id);
+
+        if ("stop".equalsIgnoreCase(message.getAction())) {
+            agentRunService.stop(ws_session);
             return;
         }
 
-        // 获取会话id
-        var sessionId = headerAccessor.getSessionId();
-        // 根据会话id获取对话对象
-        var wsSession = this.sessionManager.getSession(sessionId);
-        // 将消息对象写入到会话中
-        wsSession.receiveMessage(message);
+        if (StrUtil.isEmpty(message.getText())) {
+            log.warn("receive message empty!");
+            return;
+        }
 
-        // 异步调用大模型，并将回复信息发送给客户端
-        agentTaskExecutor.execute(() -> {
-            agentRunService.run(wsSession);
+        if (agentExecutionRegistry.isRunning(session_id)) {
+            ws_session.sendMessage(DialogMessageDTO.builder()
+                    .type(DialogMessageDTO.TYPE_SERVER)
+                    .eventType("error")
+                    .agentName("System")
+                    .trace(true)
+                    .done(false)
+                    .text("当前 Agent 正在执行，请先停止或等待完成。")
+                    .build());
+            return;
+        }
+
+        ws_session.receiveMessage(message);
+
+        String trace_id = UUID.randomUUID().toString();
+        AgentExecutionHandle handle = new AgentExecutionHandle(trace_id);
+        agentExecutionRegistry.register(session_id,handle);
+
+        Future<?> future = agentTaskExecutor.submit(() -> {
+            agentRunService.run(ws_session, trace_id, handle);
         });
-
+        handle.setFuture(future);
     }
 }

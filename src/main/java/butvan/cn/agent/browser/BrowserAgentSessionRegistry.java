@@ -14,10 +14,10 @@ public class BrowserAgentSessionRegistry {
     private final BrowserAgentFactory browserAgentFactory;
     private final Map<String, BrowserAgentRuntime> agents = new ConcurrentHashMap<>();
 
-    public BrowserAgentRuntime getOrCreate(MessageSession session) {
+    public BrowserAgentRuntime getOrCreate(MessageSession session,String traceId) {
         return agents.computeIfAbsent(
                 session.getSessionId(),
-                id -> browserAgentFactory.createRuntime(session)
+                id -> browserAgentFactory.createRuntime(session,traceId)
         );
     }
 
@@ -27,5 +27,16 @@ public class BrowserAgentSessionRegistry {
         if (runtime != null) {
             runtime.close();
         }
+    }
+
+    /**
+     * 只从缓存中移除 BrowserAgentRuntime，不主动 close。
+     *
+     * 使用场景：
+     * AgentExecutionRegistry.stop(...) 已经手动关闭了 runtime，
+     * 这里只需要删除缓存，避免下次复用。
+     */
+    public void evict(String sessionId) {
+        agents.remove(sessionId);
     }
 }

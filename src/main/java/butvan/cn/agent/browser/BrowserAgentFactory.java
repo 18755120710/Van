@@ -2,6 +2,8 @@ package butvan.cn.agent.browser;
 
 
 import butvan.cn.agent.prompt.PromptManagement;
+import butvan.cn.agent.trace.AgentTraceHook;
+import butvan.cn.agent.trace.TraceContextRegistry;
 import butvan.cn.properties.AgentScopeProperties;
 import butvan.cn.websocket.session.MessageSession;
 import io.agentscope.core.ReActAgent;
@@ -22,6 +24,8 @@ public class BrowserAgentFactory {
     private final PromptManagement promptManagement;
 
     private final AgentScopeProperties agentScopeProperties;
+
+    private final TraceContextRegistry traceContextRegistry;
 
     public ReActAgent create(MessageSession session) {
         Toolkit toolkit = browserToolkitFactory.createForSession(session);
@@ -47,7 +51,7 @@ public class BrowserAgentFactory {
                 .build();
     }
 
-    public BrowserAgentRuntime createRuntime(MessageSession session) {
+    public BrowserAgentRuntime createRuntime(MessageSession session, String traceId) {
 
         BrowserToolkitFactory.BrowserToolkitRuntime toolkitRuntime = browserToolkitFactory.createRuntimeForSession(session); // 创建工具和 PageSession
         String sys_prompt = browserSystemPrompt();
@@ -58,6 +62,7 @@ public class BrowserAgentFactory {
                 .model(model) // 使用 Spring 注入的大模型
                 .memory(new InMemoryMemory()) // 使用短期记忆
                 .toolkit(toolkitRuntime.toolkit()) // 使用带浏览器工具的 Toolkit
+                .hook(new AgentTraceHook(session,traceContextRegistry))
                 .maxIters(agentScopeProperties.getReAct().getMaxIters()) // 最大推理轮数
                 .build(); // 完成构造
 

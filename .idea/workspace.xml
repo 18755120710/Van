@@ -4,7 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="-fix: browser agent" />
+    <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="-fix: browser agent">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/BrowserAgentFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/BrowserAgentFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/BrowserAgentSessionRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/BrowserAgentSessionRegistry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/runtime/AgentExecutionHandle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/runtime/AgentExecutionHandle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/runtime/AgentExecutionRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/runtime/AgentExecutionRegistry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/tool/BrowserAgentTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/tool/BrowserAgentTool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/planner/PlannerAgentFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/planner/PlannerAgentFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/planner/PlannerToolkitFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/planner/PlannerToolkitFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/service/AgentRunService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/service/AgentRunService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/trace/AgentTraceHook.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/trace/AgentTraceHook.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/trace/TraceContextRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/trace/TraceContextRegistry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/config/AgentExecutorConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/config/AgentExecutorConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/service/impl/WebSocketServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/service/impl/WebSocketServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/websocket/dto/DialogMessageDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/websocket/dto/DialogMessageDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/prompt/promptPlanningSystem.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/prompt/promptPlanningSystem.txt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,6 +42,9 @@
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8,
   &quot;fromUser&quot;: false
@@ -37,30 +57,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;Spring Boot.AgentApplication.executor&quot;: &quot;Run&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/butvan/IdeaProjects/manaus-agnetscope-java/src/main/java/butvan/cn&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;项目&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.AgentApplication.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/butvan/IdeaProjects/manaus-agnetscope-java/src/main/java/butvan/cn",
+    "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
+    "npm.nuxt-client.executor": "Run",
+    "npm.run.executor": "Run",
+    "project.structure.last.edited": "项目",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "ts.external.directory.path": "/Applications/IntelliJ IDEA.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/java/butvan/cn" />
@@ -78,6 +103,17 @@
         <option value="js.build_tools.npm" />
       </set>
     </option>
+    <option name="hiddenConfigurations">
+      <map>
+        <entry key="js.build_tools.npm">
+          <value>
+            <set>
+              <option value="dev" />
+            </set>
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="configurationStatuses">
       <map>
         <entry key="SpringBootApplicationConfigurationType">
@@ -90,14 +126,14 @@
         <entry key="js.build_tools.npm">
           <value>
             <map>
-              <entry key="dev" value="STOPPED" />
+              <entry key="nuxt-client" value="STOPPED" />
             </map>
           </value>
         </entry>
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="npm.dev">
+  <component name="RunManager" selected="Spring Boot.AgentApplication">
     <configuration name="AgentApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <module name="manaus-agnetscope-java" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="butvan.cn.AgentApplication" />
@@ -111,19 +147,19 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/fronted/package.json" />
+    <configuration name="nuxt-client" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/frontend/package.json" />
       <command value="run" />
       <scripts>
         <script value="dev" />
       </scripts>
       <node-interpreter value="project" />
+      <package-manager value="pnpm" />
       <envs />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.dev" />
         <item itemvalue="Spring Boot.AgentApplication" />
       </list>
     </recent_temporary>
@@ -142,7 +178,8 @@
       <workItem from="1778900616019" duration="14340000" />
       <workItem from="1778942206018" duration="1814000" />
       <workItem from="1778999900306" duration="6983000" />
-      <workItem from="1779069662995" duration="1800000" />
+      <workItem from="1779069662995" duration="10100000" />
+      <workItem from="1779088144967" duration="10828000" />
     </task>
     <task id="LOCAL-00001" summary="-feat: add browser agent">
       <option name="closed" value="true" />
@@ -165,6 +202,9 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="nuxt.config.ts" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">

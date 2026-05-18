@@ -1,6 +1,7 @@
 package butvan.cn.agent.planner;
 
 import butvan.cn.agent.browser.BrowserAgentSessionRegistry;
+import butvan.cn.agent.browser.runtime.AgentExecutionRegistry;
 import butvan.cn.agent.browser.tool.BrowserAgentTool;
 import butvan.cn.websocket.session.MessageSession;
 import io.agentscope.core.tool.Toolkit;
@@ -17,13 +18,16 @@ import org.springframework.stereotype.Component;
 public class PlannerToolkitFactory {
 
     private final BrowserAgentSessionRegistry browserAgentSessionRegistry;
+    private final AgentExecutionRegistry agentExecutionRegistry;
 
-    public Toolkit createForSession(MessageSession session) {
+    public Toolkit createForSession(MessageSession session, String traceId) {
         Toolkit toolkit = new Toolkit();
 
         BrowserAgentTool browser_agent_tool = new BrowserAgentTool(
                 browserAgentSessionRegistry,
-                session
+                session,
+                traceId,
+                agentExecutionRegistry
         );
 
         toolkit.registration()
