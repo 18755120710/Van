@@ -159,9 +159,7 @@
                   </div>
 
                   <!-- 推理主文本流 -->
-                  <div v-else class="message-text">
-                    {{ message.text }}<span v-if="message.streaming" class="streaming-cursor">▌</span>
-                  </div>
+                  <div v-else class="message-text" v-html="renderMarkdown(message)"></div>
 
                   <!-- 工具调用折叠式终端日志面板 -->
                   <div v-if="message.toolResults && message.toolResults.length > 0" class="tools-execution-panel">
@@ -265,6 +263,13 @@
 
 <script>
 import { Client } from '@stomp/stompjs';
+import MarkdownIt from 'markdown-it';
+
+const md = new MarkdownIt({
+    html: true,
+    linkify: true,
+    typographer: true
+});
 
 export default {
     data() {
@@ -443,6 +448,25 @@ export default {
                     this.stompClient.activate();
                 });
             }
+        },
+        renderMarkdown(message) {
+            if (!message.text) return '';
+            let html = md.render(message.text);
+            
+            // 如果消息正在流式输出中，我们把打字机光标 ▌ 渲染在最后一个封闭的文本节点或段落内，避免折行
+            if (message.streaming) {
+                const closingParagraph = '</p>\n';
+                if (html.endsWith(closingParagraph)) {
+                    html = html.substring(0, html.length - closingParagraph.length) + 
+                           '<span class="streaming-cursor">▌</span></p>\n';
+                } else if (html.endsWith('</p>')) {
+                    html = html.substring(0, html.length - 4) + 
+                           '<span class="streaming-cursor">▌</span></p>';
+                } else {
+                    html += '<span class="streaming-cursor">▌</span>';
+                }
+            }
+            return html;
         }
     },
     mounted() {
@@ -1361,6 +1385,151 @@ export default {
 .fade-up-enter-from {
   opacity: 0;
   transform: translateY(12px);
+}
+
+/* Premium Markdown Typography & Elements Styles */
+.message-text p {
+  margin: 0 0 0.8rem 0;
+  line-height: 1.65;
+}
+
+.message-text p:last-child {
+  margin-bottom: 0;
+}
+
+.message-text h1, 
+.message-text h2, 
+.message-text h3, 
+.message-text h4 {
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-top: 1.25rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.4;
+}
+
+.message-text h1 { 
+  font-size: 1.35rem; 
+  border-bottom: 1px solid var(--border-light); 
+  padding-bottom: 0.3rem; 
+}
+
+.message-text h2 { 
+  font-size: 1.2rem; 
+  border-bottom: 1px solid rgba(228, 228, 231, 0.5);
+  padding-bottom: 0.2rem;
+}
+
+.message-text h3 { 
+  font-size: 1.05rem; 
+}
+
+.message-text h4 { 
+  font-size: 0.95rem; 
+}
+
+.message-text strong {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Lists styling */
+.message-text ul, 
+.message-text ol {
+  margin: 0 0 0.8rem 0;
+  padding-left: 1.35rem;
+  line-height: 1.6;
+}
+
+.message-text li {
+  margin-bottom: 0.35rem;
+}
+
+.message-text li::marker {
+  color: var(--accent-indigo);
+  font-weight: 600;
+}
+
+/* Blockquotes styling */
+.message-text blockquote {
+  margin: 0 0 0.8rem 0;
+  padding: 0.5rem 0.9rem;
+  border-left: 4px solid var(--accent-indigo);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Premium High-Fidelity Data Tables */
+.message-text table {
+  width: 100%;
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.message-text th {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1.5px solid var(--border-light);
+  text-align: left;
+}
+
+.message-text td {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+
+.message-text tr:last-child td {
+  border-bottom: none;
+}
+
+.message-text tr:nth-child(even) {
+  background: rgba(244, 244, 245, 0.4);
+}
+
+.message-text tr:hover {
+  background: var(--bg-active);
+}
+
+/* High-contrast Code Blocks */
+.message-text pre {
+  margin: 0.9rem 0;
+  padding: 0.85rem;
+  background: #09090b; /* Deep Black terminal code container */
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  border: 1px solid var(--border-light);
+}
+
+.message-text pre code {
+  background: transparent;
+  padding: 0;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.78rem;
+  color: #e4e4e7;
+}
+
+.message-text code {
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.8rem;
+  background: var(--bg-tertiary);
+  color: var(--accent-indigo);
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
 }
 
 /* Streaming Cursor blinking effect */
