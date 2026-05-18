@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     '~/assets/css/main.css'
   ],
   future: {
-    compatibilityVersion: 3
+    compatibilityVersion: 4
   },
   experimental: {
     viteEnvironmentApi: true
