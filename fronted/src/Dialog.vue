@@ -147,7 +147,7 @@
                   <span class="timestamp">{{ getFormattedTime() }}</span>
                 </div>
 
-                <div class="message-bubble">
+                <div class="message-bubble" :class="{ 'error-bubble': message.isError }">
                   <!-- 思考中 Skeleton 骨架屏动画 -->
                   <div v-if="!message.text && message.streaming" class="thinking-placeholder">
                     <div class="thinking-dots">
@@ -173,12 +173,21 @@
                       </span>
                     </div>
                     <div v-show="message.showTools !== false" class="tools-list">
-                      <div v-for="(tool, tIdx) in message.toolResults" :key="tIdx" class="tool-item">
+                      <div v-for="(tool, tIdx) in message.toolResults" :key="tIdx" class="tool-item" :class="tool.eventType">
                         <div class="tool-meta">
-                          <span class="tool-dot"></span>
+                          <span class="tool-dot" :class="tool.eventType"></span>
+                          <span class="tool-badge" :class="tool.eventType">{{ getEventTypeName(tool.eventType) }}</span>
+                          <span class="tool-agent" v-if="tool.agentName">
+                            <span class="meta-label">Agent:</span> {{ tool.agentName }}
+                          </span>
+                          <span class="tool-name-text" v-if="tool.toolName">
+                            <span class="meta-label">Tool:</span> {{ tool.toolName }}
+                          </span>
                           <span class="tool-time">{{ tool.timestamp }}</span>
                         </div>
-                        <pre class="tool-code"><code>{{ tool.text }}</code></pre>
+                        <div class="tool-content" v-if="tool.text">
+                          <pre class="tool-code"><code>{{ tool.text }}</code></pre>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -314,10 +323,7 @@ export default {
         return {
             disableInput: false,
             isVisible: true,
-            messages: [
-                { type: 'user', text: 'Hello, server!' },
-                { type: 'server', text: 'Hello, user!' },
-            ],
+            messages: [],
             newMessage: '',
             stompClient: null,
             isSidebarCollapsed: false,
@@ -343,99 +349,80 @@ export default {
         handleMessage(playload) {
             const message = JSON.parse(playload.body);
             
-            // 支持流式响应处理
-            if (message.streamId) {
-                let existingMsg = this.messages.find(m => m.streamId === message.streamId);
+            // 1. 优先判断 message.traceId 以支持 Agent 执行过程消息
+            if (message.traceId) {
+                let existingMsg = this.messages.find(m => m.type === 'server' && m.traceId === message.traceId);
                 
-                if (existingMsg) {
-                    // 更新流式状态
-                    if (message.streaming !== undefined) {
-                        existingMsg.streaming = message.streaming;
-                    }
-                    if (message.streamEnd !== undefined) {
-                        existingMsg.streamEnd = message.streamEnd;
-                        if (message.streamEnd) {
-                            existingMsg.streaming = false;
-                            this.disableInput = false; // 解锁输入框
-                        }
-                    }
-                    
-                    // 根据不同的事件类型分类合并
-                    if (message.eventType === 'REASONING') {
-                        if (message.text) {
-                            existingMsg.text = (existingMsg.text || '') + message.text;
-                        }
-                    } else if (message.eventType === 'AGENT_RESULT') {
-                        if (message.text) {
-                            existingMsg.text = message.text; // 最终回答作为权威结果覆盖
-                        }
-                    } else if (message.eventType === 'TOOL_RESULT') {
-                        if (message.text) {
-                            if (!existingMsg.toolResults) {
-                                existingMsg.toolResults = [];
-                            }
-                            existingMsg.toolResults.push({
-                                text: message.text,
-                                timestamp: this.getFormattedTime()
-                            });
-                        }
-                    } else if (message.eventType === 'ERROR') {
-                        existingMsg.isError = true;
-                        if (message.text) {
-                            existingMsg.text = (existingMsg.text || '') + '\n' + message.text;
-                        }
-                    } else if (message.eventType === 'SUMMARY') {
-                        if (message.text) {
-                            existingMsg.summary = (existingMsg.summary || '') + message.text;
-                        }
-                    }
-                    
-                    // 更新附件等媒体资源
-                    if (message.imageUrl) {
-                        existingMsg.imageUrl = message.imageUrl;
-                    }
-                    if (message.fileUrl) {
-                        existingMsg.fileUrl = message.fileUrl;
-                    }
-                    if (message.openUrl) {
-                        existingMsg.openUrl = message.openUrl;
-                    }
-                } else {
-                    // 创建全新的流式消息项
-                    const newMsg = {
-                        type: 'server',
-                        streamId: message.streamId,
-                        text: (message.eventType === 'REASONING' || message.eventType === 'AGENT_RESULT') ? (message.text || '') : '',
-                        eventType: message.eventType,
-                        streaming: message.streaming ?? true,
-                        streamEnd: message.streamEnd ?? false,
-                        toolResults: message.eventType === 'TOOL_RESULT' && message.text ? [{
-                            text: message.text,
-                            timestamp: this.getFormattedTime()
-                        }] : [],
-                        showTools: true, // 默认展开步骤
-                        imageUrl: message.imageUrl,
-                        fileUrl: message.fileUrl,
-                        openUrl: message.openUrl,
-                        summary: message.eventType === 'SUMMARY' ? message.text : ''
+                if (!existingMsg) {
+                    existingMsg = {
+                        type: "server",
+                        traceId: message.traceId,
+                        text: "",
+                        streaming: true,
+                        toolResults: [],
+                        showTools: true
                     };
-                    
-                    if (message.eventType === 'ERROR') {
-                        newMsg.isError = true;
-                        newMsg.text = message.text || '';
-                    }
-                    
-                    this.messages.push(newMsg);
-                    
-                    if (message.streamEnd) {
+                    this.messages.push(existingMsg);
+                }
+
+                // 更新可能存在的图片、文件、URL
+                if (message.imageUrl) {
+                    existingMsg.imageUrl = message.imageUrl;
+                }
+                if (message.fileUrl) {
+                    existingMsg.fileUrl = message.fileUrl;
+                }
+                if (message.openUrl) {
+                    existingMsg.openUrl = message.openUrl;
+                }
+
+                // 2. 当 message.trace === true 时，追加到执行步骤面板中
+                if (message.trace === true) {
+                    existingMsg.toolResults.push({
+                        eventType: message.eventType,
+                        agentName: message.agentName,
+                        toolName: message.toolName,
+                        text: message.text || "",
+                        timestamp: this.getFormattedTime()
+                    });
+                    if (message.done === true) {
+                        existingMsg.streaming = false;
                         this.disableInput = false;
-                    } else {
-                        this.disableInput = true;
                     }
                 }
+
+                // 3. 当 message.eventType === "answer" 时，设置为 server 消息的最终回答正文
+                if (message.eventType === 'answer') {
+                    existingMsg.text = message.text || "";
+                    existingMsg.streaming = false;
+                    if (message.done === true) {
+                        this.disableInput = false;
+                    }
+                }
+
+                // 4. 当 message.eventType === "error" 时，追加到 toolResults 并标记错误状态，同时恢复输入框
+                if (message.eventType === 'error') {
+                    existingMsg.toolResults.push({
+                        eventType: message.eventType,
+                        agentName: message.agentName,
+                        toolName: message.toolName,
+                        text: message.text || "",
+                        timestamp: this.getFormattedTime()
+                    });
+                    existingMsg.isError = true;
+                    existingMsg.streaming = false;
+                    this.disableInput = false;
+                }
+
+                // 5. 如果 done 为 true
+                if (message.done === true) {
+                    existingMsg.streaming = false;
+                    this.disableInput = false;
+                }
+
                 this.scrollToBottom();
             } else {
-                // 兼容原有的非流式一般消息
+                // 6. 保留旧消息兼容逻辑：如果没有 traceId，但有 text，按原来的方式 push 到 messages
                 if (message.text) {
                     this.messages.push(message);
                     this.scrollToBottom();
@@ -447,6 +434,18 @@ export default {
                         this.disableInput = true;
                     }
                 }
+            }
+        },
+        getEventTypeName(eventType) {
+            switch(eventType) {
+                case 'plan': return '规划步骤';
+                case 'agent_call': return 'Agent 调用';
+                case 'tool_call': return '工具调用';
+                case 'tool_result': return '工具结果';
+                case 'status': return '状态更新';
+                case 'error': return '异常错误';
+                case 'answer': return '最终回答';
+                default: return eventType || '执行步骤';
             }
         },
         scrollToBottom() {
@@ -1857,11 +1856,49 @@ export default {
   margin-bottom: 0.25rem;
 }
 
+/* Color indicators for different event types */
+.tool-dot.plan { background: #a855f7; } /* Purple */
+.tool-dot.agent_call { background: #3b82f6; } /* Blue */
+.tool-dot.tool_call { background: #f59e0b; } /* Amber */
+.tool-dot.tool_result { background: #10b981; } /* Emerald */
+.tool-dot.error { background: #ef4444; } /* Red */
+.tool-dot.status { background: #6b7280; } /* Gray */
+
+.tool-badge {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.tool-badge.plan { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+.tool-badge.agent_call { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+.tool-badge.tool_call { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+.tool-badge.tool_result { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+.tool-badge.error { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+.tool-badge.status { background: rgba(107, 114, 128, 0.15); color: #9ca3af; border: 1px solid rgba(107, 114, 128, 0.3); }
+
+.tool-agent, .tool-name-text {
+  font-size: 0.7rem;
+  color: #a1a1aa; /* zinc-400 */
+}
+
+.meta-label {
+  color: #52525b; /* zinc-600 */
+  font-weight: 500;
+}
+
+.server .message-bubble.error-bubble {
+  border-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
 .tool-meta {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.25rem;
 }
 
 .tool-dot {
