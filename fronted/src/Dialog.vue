@@ -287,6 +287,11 @@ const md = new MarkdownIt({
         const displayLang = (lang || 'code').toUpperCase();
         return `<div class="code-block-wrapper">
   <div class="code-block-header">
+    <div class="mac-dots">
+      <span class="mac-dot red"></span>
+      <span class="mac-dot yellow"></span>
+      <span class="mac-dot green"></span>
+    </div>
     <span class="code-lang">${displayLang}</span>
     <div class="code-actions">
       <button class="code-action-btn copy-btn" onclick="copyCode(this)">
@@ -1580,54 +1585,90 @@ export default {
   background: var(--bg-active);
 }
 
-/* High-contrast Code Blocks & VS Code Style Syntax Highlighting */
+/* High-contrast Code Blocks & Premium macOS Style Syntax Highlighting */
 .message-text :deep(.code-block-wrapper) {
-  margin: 1rem 0;
+  margin: 1.1rem 0;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-light);
+  border: 1px solid rgba(255, 255, 255, 0.08); /* 极简低饱和度暗色边框 */
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
 
 .message-text :deep(.code-block-header) {
-  background: #1e1e1e; /* VS Code tab bar background */
-  padding: 0.45rem 0.85rem;
+  background: #18181b; /* 优雅的苹果 Zinc-900 深灰底色 */
+  padding: 0.55rem 0.95rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #2d2d2d;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   user-select: none;
 }
 
+/* macOS 经典的红黄绿三色控制圆圈 */
+.message-text :deep(.mac-dots) {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  width: 50px; /* 固定宽度，配合右侧 Actions 宽度实现 Lang 绝对居中 */
+}
+
+.message-text :deep(.mac-dot) {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.message-text :deep(.mac-dot.red) {
+  background: #ff5f56;
+  box-shadow: 0 0 2px rgba(255, 95, 86, 0.4);
+}
+
+.message-text :deep(.mac-dot.yellow) {
+  background: #ffbd2e;
+  box-shadow: 0 0 2px rgba(255, 189, 46, 0.4);
+}
+
+.message-text :deep(.mac-dot.green) {
+  background: #27c93f;
+  box-shadow: 0 0 2px rgba(39, 201, 63, 0.4);
+}
+
+/* 居中优雅的编程语言徽标 */
 .message-text :deep(.code-lang) {
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   font-size: 0.72rem;
   font-weight: 600;
-  color: #858585; /* VS Code tab text grey */
+  color: rgba(255, 255, 255, 0.35); /* 半透明高级灰 */
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
+/* 简洁利落的操作按钮栏 */
 .message-text :deep(.code-actions) {
   display: flex;
   gap: 0.6rem;
   align-items: center;
+  justify-content: flex-end;
+  width: 100px; /* 固定宽度，完美平衡左侧 dots，保证标题绝对水平居中 */
 }
 
 .message-text :deep(.code-action-btn) {
   background: transparent;
   border: none;
-  color: #858585;
+  color: rgba(255, 255, 255, 0.4);
   font-size: 0.72rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.15rem 0.35rem;
+  padding: 0.2rem 0.4rem;
   border-radius: var(--radius-sm);
   transition: all 0.2s ease;
 }
 
 .message-text :deep(.code-action-btn:hover) {
-  color: #e4e4e7;
+  color: #ffffff;
   background: rgba(255, 255, 255, 0.08);
 }
 
@@ -1646,7 +1687,7 @@ export default {
 .message-text :deep(pre) {
   margin: 0.9rem 0;
   padding: 0.85rem;
-  background: #09090b; /* Deep Black terminal background for fallback */
+  background: #09090b; /* 暗色环境底色 */
   border-radius: var(--radius-md);
   overflow-x: auto;
   border: 1px solid var(--border-light);
@@ -1655,8 +1696,8 @@ export default {
 
 .message-text :deep(pre.hljs) {
   margin: 0;
-  padding: 0.85rem;
-  background: #1e1e1e; /* VS Code true editor theme background */
+  padding: 1.1rem;
+  background: #09090b; /* 苹果终端纯粹高贵深黑 (#09090b) */
   border: none;
   border-radius: 0;
   overflow-x: auto;
@@ -1668,7 +1709,8 @@ export default {
   border: none !important;
   padding: 0 !important;
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
+  line-height: 1.6;
   color: #e4e4e7;
   box-shadow: none !important;
 }
