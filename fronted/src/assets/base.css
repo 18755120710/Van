@@ -1,21 +1,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Minimalist Light Theme */
-  --color-primary: #FFFFFF;
-  --color-secondary: #F3F4F6;
-  --color-cta: #111827;
-  --color-cta-hover: #374151;
-  --color-cta-disabled: #E5E7EB;
-  --color-background: #FAFAFA;
-  --color-text: #111827;
-  --color-text-muted: #6B7280;
+  /* Premium Big-Tech Zinc Design System */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb; /* sidebar background */
+  --bg-tertiary: #f3f4f6; /* input panel base, code block header */
+  --bg-active: #e4e4e7; /* active sidebar item, hover states */
   
-  --color-border: #E5E7EB;
-  --color-border-hover: #D1D5DB;
-
-  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --text-primary: #09090b; /* zinc-950 main text */
+  --text-secondary: #3f3f46; /* zinc-700 description/secondary text */
+  --text-muted: #71717a; /* zinc-500 helper/status text */
+  --text-disabled: #a1a1aa; /* zinc-400 */
+  
+  --border-light: #e4e4e7; /* zinc-200 very fine dividers */
+  --border-medium: #d4d4d8; /* zinc-300 elements focus border */
+  
+  --accent-blue: #18181b; /* premium brand black for user messages */
+  --accent-blue-hover: #27272a;
+  --accent-indigo: #2563eb; /* actions / links */
+  --accent-indigo-light: rgba(37, 99, 235, 0.08);
+  --accent-emerald: #10b981; /* connection success breathing dot */
+  --accent-amber: #f59e0b; /* connection warning breathing dot */
+  
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
 }
 
 *,
@@ -24,22 +39,108 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-weight: normal;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 body {
-  min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
-  transition: color 0.5s, background-color 0.5s;
-  line-height: 1.6;
-  font-family: var(--font-body);
-  font-size: 15px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  line-height: 1.5;
+  font-family: var(--font-sans);
+  font-size: 14px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+/* Custom Scrollbar for modern feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e4e4e7;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d4d4d8;
+}
+
+/* Scrollbar Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #e4e4e7 transparent;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes pulse-amber {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+  }
+}
+
+@keyframes wave-bounce {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+/* Helper transitions */
+.transition-all-custom {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
