@@ -1,0 +1,20 @@
+{
+  "currentPlan" : {
+    "name" : "查看百度页面可交互元素",
+    "description" : "打开百度首页，查看并列出页面中所有可交互的元素",
+    "expectedOutcome" : "获取百度首页所有可交互元素的列表",
+    "subtasks" : [ {
+      "name" : "打开百度首页",
+      "description" : "访问 https://www.baidu.com",
+      "expectedOutcome" : "百度首页成功加载",
+      "state" : "IN_PROGRESS",
+      "createdAt" : "2026-05-16 13:23:39"
+    }, {
+      "name" : "查看页面可交互元素",
+      "description" : "调用 view_current_page_status 获取页面元素列表",
+      "expectedOutcome" : "获取页面中所有可交互元素的详细信息",
+      "state" : "TODO",
+      "createdAt" : "2026-05-16 13:23:39"
+    } ]
+  }
+}

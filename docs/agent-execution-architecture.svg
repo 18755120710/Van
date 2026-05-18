@@ -1,0 +1,223 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1320" viewBox="0 0 1800 1320">
+  <defs>
+    <style>
+      .bg { fill: #f7f9fc; }
+      .title { font: 700 34px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #172033; }
+      .subtitle { font: 500 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #5c667a; }
+      .lane-title { font: 700 20px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #172033; }
+      .box-title { font: 700 17px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #172033; }
+      .box-text { font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #39445a; }
+      .small { font: 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #667085; }
+      .code { font: 13px "SFMono-Regular", Consolas, monospace; fill: #243047; }
+      .step { font: 700 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: white; }
+      .lane { fill: #ffffff; stroke: #d8dee9; stroke-width: 1.4; }
+      .frontend { fill: #e8f2ff; stroke: #6ba7ff; }
+      .backend { fill: #eef7f1; stroke: #75ba86; }
+      .planner { fill: #fff4df; stroke: #e2a842; }
+      .browser { fill: #f1ebff; stroke: #9c7cf0; }
+      .toolkit { fill: #fff0f3; stroke: #e97791; }
+      .storage { fill: #edf2f7; stroke: #98a2b3; }
+      .note { fill: #fff; stroke: #cbd5e1; stroke-dasharray: 6 5; }
+      .arrow { stroke: #334155; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .arrow-soft { stroke: #64748b; stroke-width: 1.8; fill: none; marker-end: url(#arrowSoft); stroke-dasharray: 7 5; }
+      .num { fill: #2563eb; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#334155"/>
+    </marker>
+    <marker id="arrowSoft" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#64748b"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1800" height="1320"/>
+  <text class="title" x="60" y="62">MyManus AgentScope Java：用户提问后的多 Agent 执行链路</text>
+  <text class="subtitle" x="60" y="96">基于当前项目代码：PlannerAgent 负责规划与委派，BrowserAgent 负责浏览器执行，最终结果通过 WebSocket 推回前端。</text>
+
+  <!-- Lanes -->
+  <rect class="lane" x="50" y="130" width="300" height="1110" rx="18"/>
+  <rect class="lane" x="380" y="130" width="300" height="1110" rx="18"/>
+  <rect class="lane" x="710" y="130" width="320" height="1110" rx="18"/>
+  <rect class="lane" x="1060" y="130" width="320" height="1110" rx="18"/>
+  <rect class="lane" x="1410" y="130" width="340" height="1110" rx="18"/>
+
+  <text class="lane-title" x="75" y="170">前端 / WebSocket</text>
+  <text class="lane-title" x="405" y="170">后端入口层</text>
+  <text class="lane-title" x="735" y="170">PlannerAgent 层</text>
+  <text class="lane-title" x="1085" y="170">BrowserAgent 层</text>
+  <text class="lane-title" x="1435" y="170">浏览器工具 / Playwright</text>
+
+  <!-- Frontend -->
+  <rect class="frontend" x="85" y="215" width="230" height="92" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="110" cy="240" r="14"/><text class="step" x="105" y="245">1</text>
+  <text class="box-title" x="135" y="242">用户输入问题</text>
+  <text class="box-text" x="105" y="270">例如：搜索当前合肥天气</text>
+  <text class="code" x="105" y="290">/app/enhanced-dialog</text>
+
+  <rect class="frontend" x="85" y="1070" width="230" height="110" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="110" cy="1095" r="14"/><text class="step" x="105" y="1100">17</text>
+  <text class="box-title" x="135" y="1098">前端显示回复</text>
+  <text class="box-text" x="105" y="1126">订阅用户队列：</text>
+  <text class="code" x="105" y="1147">/user/queue/dialog</text>
+  <text class="box-text" x="105" y="1168">展示 Server 消息</text>
+
+  <!-- Backend entry -->
+  <rect class="backend" x="410" y="210" width="240" height="112" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="435" cy="235" r="14"/><text class="step" x="430" y="240">2</text>
+  <text class="box-title" x="460" y="238">WebSocketController</text>
+  <text class="code" x="430" y="266">enhancedDialog(...)</text>
+  <text class="box-text" x="430" y="292">@MessageMapping</text>
+  <text class="code" x="430" y="312">"/enhanced-dialog"</text>
+
+  <rect class="backend" x="410" y="360" width="240" height="130" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="435" cy="385" r="14"/><text class="step" x="430" y="390">3</text>
+  <text class="box-title" x="460" y="388">WebSocketServiceImpl</text>
+  <text class="code" x="430" y="416">enhancedDialog(...)</text>
+  <text class="box-text" x="430" y="444">1. 校验 message.text</text>
+  <text class="box-text" x="430" y="466">2. 获取 sessionId</text>
+
+  <rect class="backend" x="410" y="530" width="240" height="118" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="435" cy="555" r="14"/><text class="step" x="430" y="560">4</text>
+  <text class="box-title" x="460" y="558">SessionManager</text>
+  <text class="code" x="430" y="586">getSession(sessionId)</text>
+  <text class="box-text" x="430" y="614">返回 WsMessageSession</text>
+  <text class="code" x="430" y="634">receiveMessage(message)</text>
+
+  <rect class="backend" x="410" y="690" width="240" height="142" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="435" cy="715" r="14"/><text class="step" x="430" y="720">5</text>
+  <text class="box-title" x="460" y="718">AgentRunService</text>
+  <text class="code" x="430" y="746">run(MessageSession)</text>
+  <text class="box-text" x="430" y="774">readMessage() 取用户任务</text>
+  <text class="box-text" x="430" y="796">创建 PlannerAgent</text>
+  <text class="code" x="430" y="818">agent.call(msg).block()</text>
+
+  <rect class="backend storage" x="410" y="880" width="240" height="118" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="435" cy="905" r="14"/><text class="step" x="430" y="910">16</text>
+  <text class="box-title" x="460" y="908">WsMessageSession</text>
+  <text class="code" x="430" y="936">sendMessage(text)</text>
+  <text class="box-text" x="430" y="964">convertAndSendToUser</text>
+  <text class="code" x="430" y="984">/queue/dialog</text>
+
+  <!-- Planner -->
+  <rect class="planner" x="745" y="220" width="250" height="132" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="770" cy="245" r="14"/><text class="step" x="765" y="250">6</text>
+  <text class="box-title" x="795" y="248">PlannerAgentFactory</text>
+  <text class="code" x="765" y="276">create(messageSession)</text>
+  <text class="box-text" x="765" y="304">加载 promptPlanningSystem</text>
+  <text class="box-text" x="765" y="326">配置 PlanNotebook</text>
+
+  <rect class="planner" x="745" y="390" width="250" height="126" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="770" cy="415" r="14"/><text class="step" x="765" y="420">7</text>
+  <text class="box-title" x="795" y="418">PlannerToolkitFactory</text>
+  <text class="code" x="765" y="446">createForSession(session)</text>
+  <text class="box-text" x="765" y="474">注册委派工具：</text>
+  <text class="code" x="765" y="496">use_browser_agent</text>
+
+  <rect class="planner" x="745" y="555" width="250" height="140" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="770" cy="580" r="14"/><text class="step" x="765" y="585">8</text>
+  <text class="box-title" x="795" y="583">PlannerAgent</text>
+  <text class="code" x="765" y="611">ReActAgent.call(msg)</text>
+  <text class="box-text" x="765" y="639">理解任务、规划步骤</text>
+  <text class="box-text" x="765" y="661">判断需要网页检索</text>
+  <text class="code" x="765" y="683">调用 use_browser_agent</text>
+
+  <rect class="planner" x="745" y="1010" width="250" height="126" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="770" cy="1035" r="14"/><text class="step" x="765" y="1040">15</text>
+  <text class="box-title" x="795" y="1038">PlannerAgent 汇总</text>
+  <text class="box-text" x="765" y="1066">接收 BrowserAgent 结果</text>
+  <text class="box-text" x="765" y="1088">整理为用户可读答案</text>
+  <text class="code" x="765" y="1110">result.getTextContent()</text>
+
+  <!-- Browser Agent -->
+  <rect class="browser" x="1095" y="250" width="250" height="136" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="1120" cy="275" r="14"/><text class="step" x="1115" y="280">9</text>
+  <text class="box-title" x="1145" y="278">BrowserAgentTool</text>
+  <text class="code" x="1115" y="306">useBrowserAgent(task)</text>
+  <text class="box-text" x="1115" y="334">Planner 的委派入口</text>
+  <text class="box-text" x="1115" y="356">创建 BrowserAgent</text>
+
+  <rect class="browser" x="1095" y="430" width="250" height="130" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="1120" cy="455" r="14"/><text class="step" x="1115" y="460">10</text>
+  <text class="box-title" x="1145" y="458">BrowserAgentFactory</text>
+  <text class="code" x="1115" y="486">create(session)</text>
+  <text class="box-text" x="1115" y="514">加载 promptBrowserSystem</text>
+  <text class="box-text" x="1115" y="536">绑定 BrowserToolkit</text>
+
+  <rect class="browser" x="1095" y="610" width="250" height="140" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="1120" cy="635" r="14"/><text class="step" x="1115" y="640">11</text>
+  <text class="box-title" x="1145" y="638">BrowserAgent</text>
+  <text class="code" x="1115" y="666">browserAgent.call(msg)</text>
+  <text class="box-text" x="1115" y="694">执行浏览器子任务</text>
+  <text class="box-text" x="1115" y="716">按观察结果循环调用工具</text>
+  <text class="code" x="1115" y="738">go_to_url / extract_content</text>
+
+  <rect class="browser" x="1095" y="1010" width="250" height="126" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="1120" cy="1035" r="14"/><text class="step" x="1115" y="1040">14</text>
+  <text class="box-title" x="1145" y="1038">BrowserAgent 返回</text>
+  <text class="box-text" x="1115" y="1066">结构化网页结果</text>
+  <text class="box-text" x="1115" y="1088">例如天气、来源、链接</text>
+  <text class="code" x="1115" y="1110">return textContent</text>
+
+  <!-- Toolkit / Playwright -->
+  <rect class="toolkit" x="1445" y="250" width="270" height="126" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="1470" cy="275" r="14"/><text class="step" x="1465" y="280">12</text>
+  <text class="box-title" x="1495" y="278">BrowserToolkitFactory</text>
+  <text class="code" x="1465" y="306">createForSession(session)</text>
+  <text class="box-text" x="1465" y="334">创建 PageSession</text>
+  <text class="box-text" x="1465" y="356">注册 BrowserToolkit</text>
+
+  <rect class="toolkit" x="1445" y="420" width="270" height="300" rx="14" filter="url(#shadow)"/>
+  <circle class="num" cx="1470" cy="445" r="14"/><text class="step" x="1465" y="450">13</text>
+  <text class="box-title" x="1495" y="448">BrowserToolkit 方法</text>
+  <text class="code" x="1465" y="478">goToUrl(url)</text>
+  <text class="small" x="1480" y="500">-&gt; PageSession.goToUrl</text>
+  <text class="code" x="1465" y="530">viewCurrentPageStatus()</text>
+  <text class="small" x="1480" y="552">-&gt; PageSession.viewCurrentPageStatus</text>
+  <text class="code" x="1465" y="582">inputText(index, text)</text>
+  <text class="small" x="1480" y="604">-&gt; PageSession.inputText</text>
+  <text class="code" x="1465" y="634">clickElement(index)</text>
+  <text class="small" x="1480" y="656">-&gt; PageSession.clickElement</text>
+  <text class="code" x="1465" y="686">extractContent(goal)</text>
+  <text class="small" x="1480" y="708">-&gt; PageContentExtractor.extract</text>
+
+  <rect class="toolkit" x="1445" y="770" width="270" height="160" rx="14" filter="url(#shadow)"/>
+  <text class="box-title" x="1465" y="804">PageSession 内部状态</text>
+  <text class="code" x="1465" y="832">ensureContext()</text>
+  <text class="box-text" x="1465" y="858">BrowserContext context</text>
+  <text class="box-text" x="1465" y="884">Page currentPage</text>
+  <text class="box-text" x="1465" y="910">elementMap: index -&gt; selector</text>
+
+  <rect class="toolkit" x="1445" y="980" width="270" height="156" rx="14" filter="url(#shadow)"/>
+  <text class="box-title" x="1465" y="1014">Playwright / 目标网页</text>
+  <text class="box-text" x="1465" y="1042">PlaywrightManager.newBrowser()</text>
+  <text class="box-text" x="1465" y="1068">BrowserContext.newPage()</text>
+  <text class="box-text" x="1465" y="1094">Page.navigate(url)</text>
+  <text class="box-text" x="1465" y="1120">执行 buildDomTree.js 标注元素</text>
+
+  <!-- Arrows -->
+  <path class="arrow" d="M315 261 C350 261, 370 261, 410 261"/>
+  <path class="arrow" d="M530 322 C530 338, 530 344, 530 360"/>
+  <path class="arrow" d="M530 490 C530 510, 530 515, 530 530"/>
+  <path class="arrow" d="M530 648 C530 670, 530 674, 530 690"/>
+  <path class="arrow" d="M650 761 C690 761, 705 287, 745 287"/>
+  <path class="arrow" d="M870 352 C870 372, 870 374, 870 390"/>
+  <path class="arrow" d="M870 516 C870 536, 870 540, 870 555"/>
+  <path class="arrow" d="M995 625 C1035 625, 1050 318, 1095 318"/>
+  <path class="arrow" d="M1220 386 C1220 410, 1220 412, 1220 430"/>
+  <path class="arrow" d="M1345 495 C1385 495, 1400 313, 1445 313"/>
+  <path class="arrow" d="M1345 680 C1390 680, 1400 570, 1445 570"/>
+  <path class="arrow-soft" d="M1580 720 C1580 746, 1580 750, 1580 770"/>
+  <path class="arrow-soft" d="M1580 930 C1580 958, 1580 960, 1580 980"/>
+  <path class="arrow" d="M1445 1060 C1395 1060, 1390 680, 1345 680"/>
+  <path class="arrow" d="M1220 750 C1220 884, 1220 916, 1220 1010"/>
+  <path class="arrow" d="M1095 1073 C1050 1073, 1040 1073, 995 1073"/>
+  <path class="arrow" d="M745 1073 C700 1073, 695 939, 650 939"/>
+  <path class="arrow" d="M410 939 C365 939, 350 1125, 315 1125"/>
+
+  <!-- Notes -->
+  <rect class="note" x="75" y="1235" width="1640" height="55" rx="12"/>
+  <text class="box-text" x="95" y="1268">阅读重点：PlannerAgent 的工具只有 use_browser_agent；BrowserAgent 的工具才是 go_to_url、view_current_page_status、input_text、click_element、extract_content 等底层浏览器能力。</text>
+</svg>

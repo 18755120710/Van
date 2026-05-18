@@ -1,0 +1,2 @@
+{"id":"585c7054-31ce-4f31-abf4-9557446fa91f","name":null,"role":"USER","content":[{"type":"text","text":"你好"}],"metadata":{},"timestamp":"2026-05-18 10:37:06.740"}
+{"id":"4f617b08-dc49-9a83-9026-f4e01e4a70d5","name":"PlannerAgent","role":"ASSISTANT","content":[{"type":"thinking","thinking":"用户只是说了\"你好\"，这是一个简单的问候，不需要创建复杂的计划。我可以直接回复用户，不需要调用任何工具。\n","metadata":null},{"type":"text","text":"你好！我是 PlannerAgent，很高兴为您服务。请问有什么我可以帮助您的吗？"}],"metadata":{"_chat_usage":{"inputTokens":2175,"outputTokens":47,"time":1.822,"totalTokens":2222}},"timestamp":"2026-05-18 10:37:08.603"}
