@@ -972,7 +972,7 @@ export default {
   padding: 0.75rem 1rem;
   font-size: 0.92rem;
   line-height: 1.5;
-  white-space: pre-wrap;
+  white-space: normal; /* 适应 Markdown HTML 渲染，合并原生换行符 */
   word-break: break-word;
   box-shadow: var(--shadow-sm);
 }
@@ -1387,20 +1387,20 @@ export default {
   transform: translateY(12px);
 }
 
-/* Premium Markdown Typography & Elements Styles */
-.message-text p {
+/* Premium Markdown Typography & Elements Styles using deep selectors */
+.message-text :deep(p) {
   margin: 0 0 0.8rem 0;
   line-height: 1.65;
 }
 
-.message-text p:last-child {
+.message-text :deep(p:last-child) {
   margin-bottom: 0;
 }
 
-.message-text h1, 
-.message-text h2, 
-.message-text h3, 
-.message-text h4 {
+.message-text :deep(h1), 
+.message-text :deep(h2), 
+.message-text :deep(h3), 
+.message-text :deep(h4) {
   color: var(--text-primary);
   font-weight: 700;
   margin-top: 1.25rem;
@@ -1408,50 +1408,50 @@ export default {
   line-height: 1.4;
 }
 
-.message-text h1 { 
+.message-text :deep(h1) { 
   font-size: 1.35rem; 
   border-bottom: 1px solid var(--border-light); 
   padding-bottom: 0.3rem; 
 }
 
-.message-text h2 { 
+.message-text :deep(h2) { 
   font-size: 1.2rem; 
   border-bottom: 1px solid rgba(228, 228, 231, 0.5);
   padding-bottom: 0.2rem;
 }
 
-.message-text h3 { 
+.message-text :deep(h3) { 
   font-size: 1.05rem; 
 }
 
-.message-text h4 { 
+.message-text :deep(h4) { 
   font-size: 0.95rem; 
 }
 
-.message-text strong {
+.message-text :deep(strong) {
   font-weight: 700;
   color: var(--text-primary);
 }
 
 /* Lists styling */
-.message-text ul, 
-.message-text ol {
+.message-text :deep(ul), 
+.message-text :deep(ol) {
   margin: 0 0 0.8rem 0;
   padding-left: 1.35rem;
   line-height: 1.6;
 }
 
-.message-text li {
+.message-text :deep(li) {
   margin-bottom: 0.35rem;
 }
 
-.message-text li::marker {
+.message-text :deep(li::marker) {
   color: var(--accent-indigo);
   font-weight: 600;
 }
 
 /* Blockquotes styling */
-.message-text blockquote {
+.message-text :deep(blockquote) {
   margin: 0 0 0.8rem 0;
   padding: 0.5rem 0.9rem;
   border-left: 4px solid var(--accent-indigo);
@@ -1462,7 +1462,7 @@ export default {
 }
 
 /* Premium High-Fidelity Data Tables */
-.message-text table {
+.message-text :deep(table) {
   width: 100%;
   display: block;
   overflow-x: auto;
@@ -1473,7 +1473,7 @@ export default {
   box-shadow: var(--shadow-sm);
 }
 
-.message-text th {
+.message-text :deep(th) {
   background: var(--bg-tertiary);
   color: var(--text-primary);
   font-weight: 600;
@@ -1483,7 +1483,7 @@ export default {
   text-align: left;
 }
 
-.message-text td {
+.message-text :deep(td) {
   padding: 0.65rem 0.9rem;
   border-bottom: 1px solid var(--border-light);
   color: var(--text-secondary);
@@ -1492,29 +1492,30 @@ export default {
   white-space: nowrap;
 }
 
-.message-text tr:last-child td {
+.message-text :deep(tr:last-child td) {
   border-bottom: none;
 }
 
-.message-text tr:nth-child(even) {
+.message-text :deep(tr:nth-child(even)) {
   background: rgba(244, 244, 245, 0.4);
 }
 
-.message-text tr:hover {
+.message-text :deep(tr:hover) {
   background: var(--bg-active);
 }
 
 /* High-contrast Code Blocks */
-.message-text pre {
+.message-text :deep(pre) {
   margin: 0.9rem 0;
   padding: 0.85rem;
   background: #09090b; /* Deep Black terminal code container */
   border-radius: var(--radius-md);
   overflow-x: auto;
   border: 1px solid var(--border-light);
+  white-space: pre; /* 确保保留代码原有的缩进与空格 */
 }
 
-.message-text pre code {
+.message-text :deep(pre code) {
   background: transparent;
   padding: 0;
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
@@ -1522,7 +1523,7 @@ export default {
   color: #e4e4e7;
 }
 
-.message-text code {
+.message-text :deep(code) {
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   font-size: 0.8rem;
   background: var(--bg-tertiary);
