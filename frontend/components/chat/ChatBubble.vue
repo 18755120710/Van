@@ -141,7 +141,7 @@ const extractFileName = (fileUrl: string | undefined) => {
   if (!fileUrl) return 'downloaded-report'
   try {
     const parts = fileUrl.split('/')
-    return decodeURIComponent(parts[parts.length - 1])
+    return decodeURIComponent(parts[parts.length - 1] || 'downloaded-report')
   } catch (e) {
     return 'downloaded-attachment'
   }
