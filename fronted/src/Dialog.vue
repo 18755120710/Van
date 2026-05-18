@@ -1516,14 +1516,16 @@ export default {
 }
 
 .message-text :deep(pre code) {
-  background: transparent;
-  padding: 0;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   font-size: 0.78rem;
   color: #e4e4e7;
+  box-shadow: none !important;
 }
 
-.message-text :deep(code) {
+.message-text :deep(:not(pre) > code) {
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   font-size: 0.8rem;
   background: var(--bg-tertiary);
