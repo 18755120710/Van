@@ -79,31 +79,34 @@ export const useStomp = () => {
         messages.value.push(existingMsg)
       }
 
+      // 使用 100% 确定的 Message 引用，保证 TypeScript 严格模式类型安全
+      const msg: Message = existingMsg
+
       // 更新可能存在的图片、文件、URL
       if (dto.imageUrl) {
-        existingMsg.imageUrl = dto.imageUrl
+        msg.imageUrl = dto.imageUrl
       }
       if (dto.fileUrl) {
-        existingMsg.fileUrl = dto.fileUrl
+        msg.fileUrl = dto.fileUrl
       }
       if (dto.openUrl) {
-        existingMsg.openUrl = dto.openUrl
+        msg.openUrl = dto.openUrl
       }
 
       // 2. 处理 eventType === "answer_delta" 流式响应片段
       if (dto.eventType === 'answer_delta') {
-        existingMsg.text = (existingMsg.text || '') + (dto.text || '')
-        existingMsg.streaming = true
+        msg.text = (msg.text || '') + (dto.text || '')
+        msg.streaming = true
       }
 
       // 3. 处理 eventType === "answer" 最终回答信号
       else if (dto.eventType === 'answer') {
         if (dto.text) {
-          if (!existingMsg.text) {
-            existingMsg.text = dto.text
+          if (!msg.text) {
+            msg.text = dto.text
           }
         }
-        existingMsg.streaming = false
+        msg.streaming = false
         if (dto.done === true) {
           disableInput.value = false
           stopping.value = false
@@ -112,8 +115,8 @@ export const useStomp = () => {
 
       // 4. 处理 dto.trace === true 且 eventType !== "error" 的执行轨迹消息
       else if (dto.trace === true && dto.eventType !== 'error') {
-        existingMsg.toolResults = existingMsg.toolResults || []
-        existingMsg.toolResults.push({
+        msg.toolResults = msg.toolResults || []
+        msg.toolResults.push({
           eventType: dto.eventType || '',
           agentName: dto.agentName,
           toolName: dto.toolName,
@@ -126,7 +129,7 @@ export const useStomp = () => {
         isRightPanelOpen.value = true
         
         if (dto.done === true) {
-          existingMsg.streaming = false
+          msg.streaming = false
           disableInput.value = false
           stopping.value = false
         }
@@ -134,12 +137,12 @@ export const useStomp = () => {
 
       // 5. 处理 eventType === "error" 错误轨迹，且避免重复追加
       else if (dto.eventType === 'error') {
-        existingMsg.toolResults = existingMsg.toolResults || []
-        const isAlreadyAdded = existingMsg.toolResults.some(
+        msg.toolResults = msg.toolResults || []
+        const isAlreadyAdded = msg.toolResults.some(
           t => t.eventType === 'error' && t.text === dto.text
         )
         if (!isAlreadyAdded) {
-          existingMsg.toolResults.push({
+          msg.toolResults.push({
             eventType: dto.eventType,
             agentName: dto.agentName,
             toolName: dto.toolName,
@@ -149,15 +152,15 @@ export const useStomp = () => {
         }
         activeTraceMsgId.value = dto.traceId
         isRightPanelOpen.value = true
-        existingMsg.isError = true
-        existingMsg.streaming = false
+        msg.isError = true
+        msg.streaming = false
         disableInput.value = false
         stopping.value = false
       }
 
       // 6. 如果 dto.done === true，则更新状态并恢复输入框
       if (dto.done === true) {
-        existingMsg.streaming = false
+        msg.streaming = false
         disableInput.value = false
         stopping.value = false
       }
@@ -166,7 +169,7 @@ export const useStomp = () => {
       if (dto.text) {
         messages.value.push({
           type: dto.type || 'server',
-          text: dto.text,
+          text: dto.text || '',
           imageUrl: dto.imageUrl,
           fileUrl: dto.fileUrl,
           openUrl: dto.openUrl
@@ -184,7 +187,7 @@ export const useStomp = () => {
   }
 
   const connect = () => {
-    if (process.server) return
+    if (import.meta.server) return
     if (stompClient) return
 
     console.log('Starting connection to WebSocket Server')
