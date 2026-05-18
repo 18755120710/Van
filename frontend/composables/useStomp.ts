@@ -5,6 +5,7 @@ import type { Message, DialogMessageDTO } from '~/types/chat'
 // Global singleton state so that WS state persists when switching pages/components
 const isConnected = ref(false)
 const disableInput = ref(false)
+const stopping = ref(false)
 const messages = ref<Message[]>([])
 const isRightPanelOpen = ref(false)
 const activeTraceMsgId = ref<string | null>(null)
@@ -27,11 +28,45 @@ export const useStomp = () => {
       return
     }
 
+    // A. 处理 eventType === "stopped" 的情况 (覆盖 requirement 8, 16)
+    if (dto.eventType === 'stopped') {
+      let existingMsg = dto.traceId ? messages.value.find(m => m.type === 'server' && m.traceId === dto.traceId) : null
+      
+      if (existingMsg) {
+        existingMsg.streaming = false
+        existingMsg.stopped = true
+        existingMsg.toolResults = existingMsg.toolResults || []
+        existingMsg.toolResults.push({
+          eventType: 'stopped',
+          agentName: dto.agentName || 'System',
+          text: dto.text || '已停止当前 Agent 执行。',
+          timestamp: getFormattedTime()
+        })
+      } else {
+        // 如果不存在 traceId，push 一条 server 消息显示 stopped 文本
+        messages.value.push({
+          type: 'server',
+          traceId: dto.traceId,
+          text: dto.text || '已停止当前 Agent 执行。',
+          streaming: false
+        })
+      }
+      disableInput.value = false
+      stopping.value = false
+      return
+    }
+
     // 1. 优先判断 dto.traceId 以支持 Agent 执行过程消息
     if (dto.traceId) {
       let existingMsg = messages.value.find(m => m.type === 'server' && m.traceId === dto.traceId)
       
-      if (!existingMsg) {
+      if (existingMsg) {
+        // B. 如果 existingMsg.stopped === true，忽略后续非 answer/error/stopped 消息 (覆盖 requirement 17)
+        if (existingMsg.stopped && dto.eventType !== 'answer' && dto.eventType !== 'error' && dto.eventType !== 'stopped') {
+          console.log('Ignoring post-stopped message:', dto.eventType)
+          return
+        }
+      } else {
         existingMsg = {
           type: 'server',
           traceId: dto.traceId,
@@ -71,6 +106,7 @@ export const useStomp = () => {
         existingMsg.streaming = false
         if (dto.done === true) {
           disableInput.value = false
+          stopping.value = false
         }
       }
 
@@ -92,6 +128,7 @@ export const useStomp = () => {
         if (dto.done === true) {
           existingMsg.streaming = false
           disableInput.value = false
+          stopping.value = false
         }
       }
 
@@ -115,12 +152,14 @@ export const useStomp = () => {
         existingMsg.isError = true
         existingMsg.streaming = false
         disableInput.value = false
+        stopping.value = false
       }
 
       // 6. 如果 dto.done === true，则更新状态并恢复输入框
       if (dto.done === true) {
         existingMsg.streaming = false
         disableInput.value = false
+        stopping.value = false
       }
     } else {
       // 7. 保留旧消息兼容逻辑：如果没有 traceId，但有 text，按原来的方式 push 到 messages
@@ -136,6 +175,7 @@ export const useStomp = () => {
       if (dto.meta) {
         if (dto.meta.serverStatusHint === 0) {
           disableInput.value = false
+          stopping.value = false
         } else if (dto.meta.serverStatusHint === 1) {
           disableInput.value = true
         }
@@ -203,10 +243,32 @@ export const useStomp = () => {
     })
 
     disableInput.value = true
+    stopping.value = false
 
     const payload = {
       type: 'user',
+      action: 'chat',
       text
+    }
+
+    stompClient.publish({
+      destination: '/app/enhanced-dialog',
+      body: JSON.stringify(payload)
+    })
+  }
+
+  const stopAgent = () => {
+    if (!stompClient || !isConnected.value) {
+      console.warn('STOMP client not connected, cannot stop agent')
+      return
+    }
+
+    stopping.value = true
+
+    const payload = {
+      type: 'user',
+      action: 'stop',
+      text: ''
     }
 
     stompClient.publish({
@@ -227,12 +289,14 @@ export const useStomp = () => {
   return {
     isConnected,
     disableInput,
+    stopping,
     messages,
     isRightPanelOpen,
     activeTraceMsgId,
     connect,
     disconnect,
     sendMessage,
+    stopAgent,
     openTracePanel,
     clearMessages
   }
