@@ -22,8 +22,9 @@
           :disabled="disableInput"
         />
         <button
+          v-if="!disableInput"
           @click="handleSend"
-          :disabled="disableInput || !newMessage.trim()"
+          :disabled="!newMessage.trim()"
           class="btn-send"
           title="Send Message"
           type="button"
@@ -32,6 +33,22 @@
             <line x1="22" y1="2" x2="11" y2="13" />
             <polygon points="22 2 15 22 11 13 2 9 22 2" />
           </svg>
+        </button>
+        <button
+          v-else
+          @click="handleStop"
+          :disabled="stopping"
+          class="btn-stop"
+          title="Stop Execution"
+          type="button"
+        >
+          <span v-if="stopping" class="stopping-text">停止中...</span>
+          <template v-else>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            </svg>
+            <span>停止</span>
+          </template>
         </button>
       </div>
 
@@ -49,7 +66,7 @@ import { useStomp } from '~/composables/useStomp'
 const newMessage = ref('')
 const inputField = ref<HTMLInputElement | null>(null)
 
-const { disableInput, sendMessage: sendStompMessage } = useStomp()
+const { disableInput, stopping, sendMessage: sendStompMessage, stopAgent } = useStomp()
 
 const handleSend = () => {
   const text = newMessage.value.trim()
@@ -57,6 +74,10 @@ const handleSend = () => {
   
   sendStompMessage(text)
   newMessage.value = ''
+}
+
+const handleStop = () => {
+  stopAgent()
 }
 
 const prefillPrompt = (text: string) => {
