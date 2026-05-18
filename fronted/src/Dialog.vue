@@ -161,35 +161,12 @@
                   <!-- 推理主文本流 -->
                   <div v-else class="message-text" v-html="renderMarkdown(message)"></div>
 
-                  <!-- 工具调用折叠式终端日志面板 -->
-                  <div v-if="message.toolResults && message.toolResults.length > 0" class="tools-execution-panel">
-                    <div class="tools-header" @click="message.showTools = !message.showTools">
-                      <div class="tools-title">
-                        <svg class="tool-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                        <span>执行步骤日志 ({{ message.toolResults.length }})</span>
-                      </div>
-                      <span class="toggle-arrow" :class="{ 'expanded': message.showTools }">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                      </span>
-                    </div>
-                    <div v-show="message.showTools !== false" class="tools-list">
-                      <div v-for="(tool, tIdx) in message.toolResults" :key="tIdx" class="tool-item" :class="tool.eventType">
-                        <div class="tool-meta">
-                          <span class="tool-dot" :class="tool.eventType"></span>
-                          <span class="tool-badge" :class="tool.eventType">{{ getEventTypeName(tool.eventType) }}</span>
-                          <span class="tool-agent" v-if="tool.agentName">
-                            <span class="meta-label">Agent:</span> {{ tool.agentName }}
-                          </span>
-                          <span class="tool-name-text" v-if="tool.toolName">
-                            <span class="meta-label">Tool:</span> {{ tool.toolName }}
-                          </span>
-                          <span class="tool-time">{{ tool.timestamp }}</span>
-                        </div>
-                        <div class="tool-content" v-if="tool.text">
-                          <pre class="tool-code"><code>{{ tool.text }}</code></pre>
-                        </div>
-                      </div>
-                    </div>
+                  <!-- 精致的侧边栏日志唤起按钮 -->
+                  <div v-if="message.toolResults && message.toolResults.length > 0" class="view-trace-action">
+                    <button class="btn-view-trace" :class="{ 'active': activeTraceMsgId === message.traceId && isRightPanelOpen }" @click="openTracePanel(message)">
+                      <svg class="tool-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                      <span>{{ activeTraceMsgId === message.traceId && isRightPanelOpen ? '正在查看执行步骤' : '查看执行步骤' }} ({{ message.toolResults.length }})</span>
+                    </button>
                   </div>
                   
                   <!-- 丰富的媒体图片展示 (如有) -->
@@ -267,6 +244,50 @@
 
       </div>
     </main>
+
+    <!-- Right Sidebar Panel -->
+    <aside class="right-panel" :class="{ 'open': isRightPanelOpen }">
+      <div class="right-panel-header">
+        <div class="right-panel-title">
+          <svg class="tool-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>执行步骤与深度思考</span>
+          <span class="right-panel-count" v-if="activeTraceMsg && activeTraceMsg.toolResults">
+            ({{ activeTraceMsg.toolResults.length }})
+          </span>
+        </div>
+        <button class="close-right-panel-btn" @click="isRightPanelOpen = false" title="关闭面板">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      
+      <!-- Right panel content containing the beautiful logs list -->
+      <div class="right-panel-content" ref="rightPanelContent" v-if="activeTraceMsg">
+        <div class="right-panel-empty" v-if="!activeTraceMsg.toolResults || activeTraceMsg.toolResults.length === 0">
+          <div class="empty-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </div>
+          <p>暂无执行步骤日志</p>
+        </div>
+        <div class="right-tools-list" v-else>
+          <div v-for="(tool, tIdx) in activeTraceMsg.toolResults" :key="tIdx" class="tool-item" :class="tool.eventType">
+            <div class="tool-meta">
+              <span class="tool-dot" :class="tool.eventType"></span>
+              <span class="tool-badge" :class="tool.eventType">{{ getEventTypeName(tool.eventType) }}</span>
+              <span class="tool-agent" v-if="tool.agentName">
+                <span class="meta-label">Agent:</span> {{ tool.agentName }}
+              </span>
+              <span class="tool-name-text" v-if="tool.toolName">
+                <span class="meta-label">Tool:</span> {{ tool.toolName }}
+              </span>
+              <span class="tool-time">{{ tool.timestamp }}</span>
+            </div>
+            <div class="tool-content" v-if="tool.text">
+              <pre class="tool-code"><code>{{ tool.text }}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
   </div>
 </template>
 
@@ -327,8 +348,16 @@ export default {
             newMessage: '',
             stompClient: null,
             isSidebarCollapsed: false,
-            isConnected: false
+            isConnected: false,
+            isRightPanelOpen: false,
+            activeTraceMsgId: null
         };
+    },
+    computed: {
+        activeTraceMsg() {
+            if (!this.activeTraceMsgId) return null;
+            return this.messages.find(m => m.type === 'server' && m.traceId === this.activeTraceMsgId) || null;
+        }
     },
     methods: {
         sendMessage() {
@@ -381,6 +410,9 @@ export default {
                 if (message.eventType === 'answer_delta') {
                     existingMsg.text = (existingMsg.text || '') + (message.text || '');
                     existingMsg.streaming = true;
+                    this.activeTraceMsgId = message.traceId;
+                    this.isRightPanelOpen = true;
+                    this.scrollToRightPanelBottom();
                 }
 
                 // 3. 处理 eventType === "answer" 最终回答信号
@@ -405,6 +437,9 @@ export default {
                         text: message.text || "",
                         timestamp: this.getFormattedTime()
                     });
+                    this.activeTraceMsgId = message.traceId;
+                    this.isRightPanelOpen = true;
+                    this.scrollToRightPanelBottom();
                     if (message.done === true) {
                         existingMsg.streaming = false;
                         this.disableInput = false;
@@ -423,6 +458,9 @@ export default {
                             timestamp: this.getFormattedTime()
                         });
                     }
+                    this.activeTraceMsgId = message.traceId;
+                    this.isRightPanelOpen = true;
+                    this.scrollToRightPanelBottom();
                     existingMsg.isError = true;
                     existingMsg.streaming = false;
                     this.disableInput = false;
@@ -470,6 +508,19 @@ export default {
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 }
             });
+        },
+        scrollToRightPanelBottom() {
+            this.$nextTick(() => {
+                const rightPanelContent = this.$refs.rightPanelContent;
+                if(rightPanelContent) {
+                    rightPanelContent.scrollTop = rightPanelContent.scrollHeight;
+                }
+            });
+        },
+        openTracePanel(message) {
+            this.activeTraceMsgId = message.traceId;
+            this.isRightPanelOpen = true;
+            this.scrollToRightPanelBottom();
         },
         clearChatHistory() {
             if (confirm("Are you sure you want to wipe the session conversation history?")) {
@@ -1939,6 +1990,148 @@ export default {
   white-space: pre-wrap;
   word-break: break-all;
   line-height: 1.4;
+}
+
+/* Sleek view-trace-action button group inside chat bubble */
+.view-trace-action {
+  margin-top: 0.65rem;
+  display: flex;
+}
+
+.btn-view-trace {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 550;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.btn-view-trace:hover {
+  background: var(--bg-active);
+  border-color: var(--border-medium);
+  color: var(--text-primary);
+}
+
+.btn-view-trace.active {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: var(--accent-indigo);
+}
+
+.btn-view-trace .tool-icon {
+  color: var(--accent-indigo);
+}
+
+/* Right Sidebar Panel Drawer Layout */
+.right-panel {
+  width: 420px;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 15;
+  transform: translateX(420px);
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.right-panel.open {
+  transform: translateX(0);
+  position: relative; /* 当打开时，占据布局空间，使聊天区域变窄自适应 */
+}
+
+/* 如果屏幕较窄，自动变成悬浮遮罩 */
+@media (max-width: 1200px) {
+  .right-panel.open {
+    position: absolute;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.right-panel-header {
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+.right-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.right-panel-count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.close-right-panel-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.close-right-panel-btn:hover {
+  background: var(--bg-active);
+  color: var(--text-primary);
+}
+
+.right-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  background: #09090b; /* Zinc Black Background */
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.right-panel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #71717a; /* Zinc 500 */
+  gap: 0.5rem;
+}
+
+.right-panel-empty .empty-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.right-tools-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
 }
 
 /* Responsive queries */
