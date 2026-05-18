@@ -148,21 +148,55 @@
                 </div>
 
                 <div class="message-bubble">
-                  <!-- Text block -->
-                  <div class="message-text">{{ message.text }}</div>
+                  <!-- 思考中 Skeleton 骨架屏动画 -->
+                  <div v-if="!message.text && message.streaming" class="thinking-placeholder">
+                    <div class="thinking-dots">
+                      <span class="thinking-dot"></span>
+                      <span class="thinking-dot"></span>
+                      <span class="thinking-dot"></span>
+                    </div>
+                    <span class="thinking-text">AgentScope 正在规划步骤...</span>
+                  </div>
+
+                  <!-- 推理主文本流 -->
+                  <div v-else class="message-text">
+                    {{ message.text }}<span v-if="message.streaming" class="streaming-cursor">▌</span>
+                  </div>
+
+                  <!-- 工具调用折叠式终端日志面板 -->
+                  <div v-if="message.toolResults && message.toolResults.length > 0" class="tools-execution-panel">
+                    <div class="tools-header" @click="message.showTools = !message.showTools">
+                      <div class="tools-title">
+                        <svg class="tool-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        <span>执行步骤日志 ({{ message.toolResults.length }})</span>
+                      </div>
+                      <span class="toggle-arrow" :class="{ 'expanded': message.showTools }">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                      </span>
+                    </div>
+                    <div v-show="message.showTools !== false" class="tools-list">
+                      <div v-for="(tool, tIdx) in message.toolResults" :key="tIdx" class="tool-item">
+                        <div class="tool-meta">
+                          <span class="tool-dot"></span>
+                          <span class="tool-time">{{ tool.timestamp }}</span>
+                        </div>
+                        <pre class="tool-code"><code>{{ tool.text }}</code></pre>
+                      </div>
+                    </div>
+                  </div>
                   
-                  <!-- Rich Media Card (if image returned) -->
+                  <!-- 丰富的媒体图片展示 (如有) -->
                   <div v-if="message.imageUrl" class="media-container">
                     <a :href="message.imageUrl" target="_blank" class="media-card-link">
                       <img :src="message.imageUrl" class="media-preview" alt="Generated visual attachment" />
                       <div class="media-overlay">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        <span>View Attachment</span>
+                        <span>查看大图</span>
                       </div>
                     </a>
                   </div>
 
-                  <!-- File Download Card (if attachments returned) -->
+                  <!-- 文件下载卡片 (如有) -->
                   <div v-if="message.fileUrl" class="file-container">
                     <a :href="message.fileUrl" target="_blank" class="file-download-card">
                       <div class="file-icon">
@@ -170,7 +204,7 @@
                       </div>
                       <div class="file-details">
                         <span class="file-name">{{ extractFileName(message.fileUrl) }}</span>
-                        <span class="file-action">Click to download report file</span>
+                        <span class="file-action">点击下载报告文件</span>
                       </div>
                       <div class="file-arrow">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -253,6 +287,7 @@ export default {
                 var msg = { type: 'user', text: this.newMessage };
                 this.messages.push(msg);
                 this.newMessage = '';
+                this.disableInput = true; // 发送时立即加锁，等待流式输出
                 if(this.stompClient && this.stompClient.connected) {
                     this.stompClient.publish({ destination: '/app/enhanced-dialog', body: JSON.stringify(msg) });
                 }
@@ -264,15 +299,110 @@ export default {
         },
         handleMessage(playload) {
             const message = JSON.parse(playload.body);
-            if (message.text) {
-                this.messages.push(message);
+            
+            // 支持流式响应处理
+            if (message.streamId) {
+                let existingMsg = this.messages.find(m => m.streamId === message.streamId);
+                
+                if (existingMsg) {
+                    // 更新流式状态
+                    if (message.streaming !== undefined) {
+                        existingMsg.streaming = message.streaming;
+                    }
+                    if (message.streamEnd !== undefined) {
+                        existingMsg.streamEnd = message.streamEnd;
+                        if (message.streamEnd) {
+                            existingMsg.streaming = false;
+                            this.disableInput = false; // 解锁输入框
+                        }
+                    }
+                    
+                    // 根据不同的事件类型分类合并
+                    if (message.eventType === 'REASONING') {
+                        if (message.text) {
+                            existingMsg.text = (existingMsg.text || '') + message.text;
+                        }
+                    } else if (message.eventType === 'AGENT_RESULT') {
+                        if (message.text) {
+                            existingMsg.text = message.text; // 最终回答作为权威结果覆盖
+                        }
+                    } else if (message.eventType === 'TOOL_RESULT') {
+                        if (message.text) {
+                            if (!existingMsg.toolResults) {
+                                existingMsg.toolResults = [];
+                            }
+                            existingMsg.toolResults.push({
+                                text: message.text,
+                                timestamp: this.getFormattedTime()
+                            });
+                        }
+                    } else if (message.eventType === 'ERROR') {
+                        existingMsg.isError = true;
+                        if (message.text) {
+                            existingMsg.text = (existingMsg.text || '') + '\n' + message.text;
+                        }
+                    } else if (message.eventType === 'SUMMARY') {
+                        if (message.text) {
+                            existingMsg.summary = (existingMsg.summary || '') + message.text;
+                        }
+                    }
+                    
+                    // 更新附件等媒体资源
+                    if (message.imageUrl) {
+                        existingMsg.imageUrl = message.imageUrl;
+                    }
+                    if (message.fileUrl) {
+                        existingMsg.fileUrl = message.fileUrl;
+                    }
+                    if (message.openUrl) {
+                        existingMsg.openUrl = message.openUrl;
+                    }
+                } else {
+                    // 创建全新的流式消息项
+                    const newMsg = {
+                        type: 'server',
+                        streamId: message.streamId,
+                        text: (message.eventType === 'REASONING' || message.eventType === 'AGENT_RESULT') ? (message.text || '') : '',
+                        eventType: message.eventType,
+                        streaming: message.streaming ?? true,
+                        streamEnd: message.streamEnd ?? false,
+                        toolResults: message.eventType === 'TOOL_RESULT' && message.text ? [{
+                            text: message.text,
+                            timestamp: this.getFormattedTime()
+                        }] : [],
+                        showTools: true, // 默认展开步骤
+                        imageUrl: message.imageUrl,
+                        fileUrl: message.fileUrl,
+                        openUrl: message.openUrl,
+                        summary: message.eventType === 'SUMMARY' ? message.text : ''
+                    };
+                    
+                    if (message.eventType === 'ERROR') {
+                        newMsg.isError = true;
+                        newMsg.text = message.text || '';
+                    }
+                    
+                    this.messages.push(newMsg);
+                    
+                    if (message.streamEnd) {
+                        this.disableInput = false;
+                    } else {
+                        this.disableInput = true;
+                    }
+                }
                 this.scrollToBottom();
-            }
-            if (message.meta) {
-                if (message.meta.serverStatusHint == 0) {
-                    this.disableInput = false;
-                } else if (message.meta.serverStatusHint == 1) {
-                    this.disableInput = true;
+            } else {
+                // 兼容原有的非流式一般消息
+                if (message.text) {
+                    this.messages.push(message);
+                    this.scrollToBottom();
+                }
+                if (message.meta) {
+                    if (message.meta.serverStatusHint == 0) {
+                        this.disableInput = false;
+                    } else if (message.meta.serverStatusHint == 1) {
+                        this.disableInput = true;
+                    }
                 }
             }
         },
@@ -1231,6 +1361,168 @@ export default {
 .fade-up-enter-from {
   opacity: 0;
   transform: translateY(12px);
+}
+
+/* Streaming Cursor blinking effect */
+.streaming-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--accent-indigo);
+  font-weight: 700;
+  animation: cursor-blink 0.8s infinite;
+  vertical-align: middle;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+/* Thinking state Skeleton waves */
+.thinking-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+}
+
+.thinking-dots {
+  display: flex;
+  align-items: center;
+  gap: 3.5px;
+}
+
+.thinking-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+  animation: thinking-bounce 1.4s infinite ease-in-out both;
+  opacity: 0.6;
+}
+
+.thinking-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.thinking-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+.thinking-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+@keyframes thinking-bounce {
+  0%, 80%, 100% { 
+    transform: scale(0.6);
+    opacity: 0.5;
+  } 
+  40% { 
+    transform: scale(1.1);
+    opacity: 1;
+    background-color: var(--accent-indigo);
+  }
+}
+
+/* Collapsible Tools Execution Panel */
+.tools-execution-panel {
+  margin-top: 0.75rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.tools-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.85rem;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.15s ease;
+}
+
+.tools-header:hover {
+  background: var(--bg-active);
+}
+
+.tools-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.tool-icon {
+  color: var(--accent-indigo);
+}
+
+.toggle-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.toggle-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+.tools-list {
+  padding: 0.6rem 0.85rem;
+  background: #09090b; /* Deep Zinc Black Terminal Background */
+  max-height: 250px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tool-item {
+  border-left: 2px solid #27272a; /* Zinc 800 line */
+  padding-left: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.tool-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.2rem;
+}
+
+.tool-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+}
+
+.tool-time {
+  font-size: 0.65rem;
+  color: #71717a; /* Zinc-500 */
+  font-family: monospace;
+}
+
+.tool-code {
+  margin: 0;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.75rem;
+  color: #e4e4e7; /* zinc-200 */
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.4;
 }
 
 /* Responsive queries */
