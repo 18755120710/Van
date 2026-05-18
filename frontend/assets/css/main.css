@@ -964,7 +964,7 @@ h1, h2, h3, h4, h5, h6 {
 .input-box-wrapper.disabled {
   background: var(--bg-secondary);
   box-shadow: var(--shadow-sm);
-  cursor: not-allowed;
+  cursor: default;
 }
 
 .input-box-wrapper input {
@@ -1016,6 +1016,46 @@ h1, h2, h3, h4, h5, h6 {
 .btn-send svg {
   width: 14px;
   height: 14px;
+}
+
+.btn-stop {
+  height: 32px;
+  padding: 0 0.85rem;
+  border-radius: var(--radius-md);
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.btn-stop:hover:not(:disabled) {
+  background: #dc2626;
+  transform: scale(1.02);
+}
+
+.btn-stop:disabled {
+  background: var(--bg-tertiary);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.btn-stop svg {
+  width: 12px;
+  height: 12px;
+}
+
+.stopping-text {
+  font-size: 0.8rem;
+  font-weight: 550;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .input-disclaimer {
@@ -1425,6 +1465,7 @@ h1, h2, h3, h4, h5, h6 {
 .tool-dot.error { background: #ef4444; }
 .tool-dot.status { background: #6b7280; }
 .tool-dot.summary { background: #14b8a6; }
+.tool-dot.stopped { background: #ef4444; }
 
 .tool-badge {
   font-size: 0.65rem;
@@ -1441,6 +1482,7 @@ h1, h2, h3, h4, h5, h6 {
 .tool-badge.error { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 .tool-badge.status { background: rgba(107, 114, 128, 0.15); color: #9ca3af; border: 1px solid rgba(107, 114, 128, 0.3); }
 .tool-badge.summary { background: rgba(20, 184, 166, 0.15); color: #2dd4bf; border: 1px solid rgba(20, 184, 166, 0.3); }
+.tool-badge.stopped { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 
 .tool-agent, .tool-name-text {
   font-size: 0.7rem;

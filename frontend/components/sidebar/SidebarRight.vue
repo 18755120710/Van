@@ -78,6 +78,7 @@ const getEventTypeName = (eventType: string) => {
     case 'error': return '异常错误'
     case 'summary': return '执行摘要'
     case 'answer': return '最终回答'
+    case 'stopped': return '执行停止'
     default: return eventType || '执行步骤'
   }
 }
