@@ -264,11 +264,44 @@
 <script>
 import { Client } from '@stomp/stompjs';
 import MarkdownIt from 'markdown-it';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/vs2015.min.css'; // VS Code 暗色主题
 
 const md = new MarkdownIt({
     html: true,
     linkify: true,
-    typographer: true
+    typographer: true,
+    highlight: function (str, lang) {
+        let highlightedCode = '';
+        const escapeHtml = md.utils.escapeHtml;
+        if (lang && hljs.getLanguage(lang)) {
+            try {
+                highlightedCode = hljs.highlight(str, { language: lang, ignoreIllegals: true }).value;
+            } catch (__) {
+                highlightedCode = escapeHtml(str);
+            }
+        } else {
+            highlightedCode = escapeHtml(str);
+        }
+
+        const displayLang = (lang || 'code').toUpperCase();
+        return `<div class="code-block-wrapper">
+  <div class="code-block-header">
+    <span class="code-lang">${displayLang}</span>
+    <div class="code-actions">
+      <button class="code-action-btn copy-btn" onclick="copyCode(this)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:2px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span>复制</span>
+      </button>
+      <button class="code-action-btn fold-btn" onclick="toggleCodeFold(this)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:2px;"><polyline points="6 9 12 15 18 9"/></svg>
+        <span>折叠</span>
+      </button>
+    </div>
+  </div>
+  <pre class="hljs"><code>${highlightedCode}</code></pre>
+</div>`;
+    }
 });
 
 export default {
@@ -491,11 +524,54 @@ export default {
             this.isConnected = false;
         };
 
+        // 注册全局代码块操作函数（复制与折叠）
+        window.copyCode = function(button) {
+            const wrapper = button.closest('.code-block-wrapper');
+            if (!wrapper) return;
+            const codeEl = wrapper.querySelector('pre code');
+            if (!codeEl) return;
+            
+            const text = codeEl.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const textSpan = button.querySelector('span');
+                if (textSpan) {
+                    const originalText = textSpan.innerText;
+                    textSpan.innerText = '已复制！';
+                    button.classList.add('success');
+                    setTimeout(() => {
+                        textSpan.innerText = originalText;
+                        button.classList.remove('success');
+                    }, 2000);
+                }
+            }).catch(err => {
+                console.error('无法复制代码: ', err);
+            });
+        };
+
+        window.toggleCodeFold = function(button) {
+            const wrapper = button.closest('.code-block-wrapper');
+            if (!wrapper) return;
+            const preEl = wrapper.querySelector('pre');
+            if (!preEl) return;
+            
+            const textSpan = button.querySelector('span');
+            if (preEl.style.display === 'none') {
+                preEl.style.display = 'block';
+                if (textSpan) textSpan.innerText = '折叠';
+                button.classList.remove('collapsed');
+            } else {
+                preEl.style.display = 'none';
+                if (textSpan) textSpan.innerText = '展开';
+                button.classList.add('collapsed');
+            }
+        };
+
         this.stompClient.onStompError = (frame) => {
             console.error('Broker reported error: ' + frame.headers['message']);
             console.error('Additional details: ' + frame.body);
             this.isConnected = false;
         };
+
         this.stompClient.activate();
     }
 };
@@ -1504,15 +1580,87 @@ export default {
   background: var(--bg-active);
 }
 
-/* High-contrast Code Blocks */
+/* High-contrast Code Blocks & VS Code Style Syntax Highlighting */
+.message-text :deep(.code-block-wrapper) {
+  margin: 1rem 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.message-text :deep(.code-block-header) {
+  background: #1e1e1e; /* VS Code tab bar background */
+  padding: 0.45rem 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #2d2d2d;
+  user-select: none;
+}
+
+.message-text :deep(.code-lang) {
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #858585; /* VS Code tab text grey */
+}
+
+.message-text :deep(.code-actions) {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.message-text :deep(.code-action-btn) {
+  background: transparent;
+  border: none;
+  color: #858585;
+  font-size: 0.72rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.message-text :deep(.code-action-btn:hover) {
+  color: #e4e4e7;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.message-text :deep(.code-action-btn.success) {
+  color: #22c55e !important;
+}
+
+.message-text :deep(.code-action-btn.collapsed svg) {
+  transform: rotate(-90deg);
+}
+
+.message-text :deep(.code-action-btn svg) {
+  transition: transform 0.2s ease;
+}
+
 .message-text :deep(pre) {
   margin: 0.9rem 0;
   padding: 0.85rem;
-  background: #09090b; /* Deep Black terminal code container */
+  background: #09090b; /* Deep Black terminal background for fallback */
   border-radius: var(--radius-md);
   overflow-x: auto;
   border: 1px solid var(--border-light);
-  white-space: pre; /* 确保保留代码原有的缩进与空格 */
+  white-space: pre;
+}
+
+.message-text :deep(pre.hljs) {
+  margin: 0;
+  padding: 0.85rem;
+  background: #1e1e1e; /* VS Code true editor theme background */
+  border: none;
+  border-radius: 0;
+  overflow-x: auto;
+  white-space: pre;
 }
 
 .message-text :deep(pre code) {
