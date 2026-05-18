@@ -135,7 +135,7 @@ export default {
     border-bottom: 1px solid var(--color-border);
     display: flex;
     align-items: center;
-    background: rgba(2, 6, 23, 0.8);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
     z-index: 10;
 }
@@ -214,7 +214,7 @@ export default {
     font-weight: 600;
     font-size: 0.85rem;
     flex-shrink: 0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .user .avatar {
@@ -240,7 +240,7 @@ export default {
     font-size: 0.95rem;
     line-height: 1.6;
     word-wrap: break-word;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .user .message-text {
@@ -272,9 +272,9 @@ export default {
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background: rgba(34, 197, 94, 0.1);
-    color: var(--color-cta);
-    border: 1px solid rgba(34, 197, 94, 0.2);
+    background: var(--color-secondary);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     text-decoration: none;
     font-size: 0.9rem;
@@ -282,7 +282,7 @@ export default {
     transition: all 0.2s ease;
 }
 .download-link:hover {
-    background: rgba(34, 197, 94, 0.2);
+    background: var(--color-border);
 }
 
 /* Input Area */
@@ -300,12 +300,12 @@ export default {
     background: var(--color-primary);
     border: 1px solid var(--color-border);
     border-radius: 16px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .message-input:focus-within {
     border-color: var(--color-border-hover);
-    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+    box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1);
 }
 
 .message-input input {
@@ -331,7 +331,7 @@ export default {
     align-items: center;
     justify-content: center;
     background: var(--color-cta);
-    color: #020617;
+    color: #FFFFFF;
     border: none;
     border-radius: 12px;
     width: 44px;
