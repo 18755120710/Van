@@ -1,7 +1,7 @@
 import type { PromptInfo, PromptContent } from '~/types/agentConfig'
 
 export const useAgentConfig = () => {
-  const BASE_URL = 'http://localhost:18081/agent-config'
+  const BASE_URL = '/agent-config'
 
   const listPrompts = async (): Promise<PromptInfo[]> => {
     const res = await fetch(`${BASE_URL}/prompts`)

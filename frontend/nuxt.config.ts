@@ -18,6 +18,10 @@ export default defineNuxtConfig({
       '/conversations': {
         target: 'http://localhost:18081/conversations',
         changeOrigin: true
+      },
+      '/agent-config': {
+        target: 'http://localhost:18081/agent-config',
+        changeOrigin: true
       }
     }
   }
