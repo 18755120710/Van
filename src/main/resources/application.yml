@@ -15,6 +15,10 @@ memory:
     session-dir: ./memory/sessions
 data:
   conversation-dir: ./data/conversations
+prompt:
+  locale: /prompt
+agent-config:
+  prompt-dir: ./agent-config/prompts
 
 file:
   base: /temp/my-manus-agentscope

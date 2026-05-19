@@ -4,61 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="feat(agent): 增加执行过程追踪与停止控制&#10;&#10;- 新增 Agent 执行注册表与运行句柄，跟踪当前会话任务&#10;- 支持 WebSocket stop 指令，中断正在运行的 PlannerAgent 和 BrowserAgent&#10;- 停止时释放 stream、取消 Future，并清理浏览器运行时&#10;- 增加规划、工具调用、浏览器委派、摘要和最终回答等 trace 事件&#10;- 前端支持执行步骤面板、answer_delta 流式输出、停止状态和停止按钮&#10;- 清理已关闭的 BrowserAgentRuntime，避免复用已停止的浏览器会话">
+    <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="feat: add README.md file">
+      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/model/PromptContent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/model/PromptInfo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/model/UpdatePromptRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/PromptConfigService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/impl/PromptConfigServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/controller/AgentConfigController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/agent-question-execution-flow.excalidraw" beforeDir="false" afterPath="$PROJECT_DIR$/docs/agent-question-execution-flow.excalidraw" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/05ac894d-3e22-3322-c10d-f558b6265de6/agent_meta.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/05ac894d-3e22-3322-c10d-f558b6265de6/memory_messages.hash" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/05ac894d-3e22-3322-c10d-f558b6265de6/memory_messages.jsonl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/05ac894d-3e22-3322-c10d-f558b6265de6/planNotebook_state.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/05ac894d-3e22-3322-c10d-f558b6265de6/toolkit_activeGroups.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/111e0f8a-f978-eb3b-1e45-53ef5ca3ce03/agent_meta.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/111e0f8a-f978-eb3b-1e45-53ef5ca3ce03/memory_messages.hash" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/111e0f8a-f978-eb3b-1e45-53ef5ca3ce03/memory_messages.jsonl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/111e0f8a-f978-eb3b-1e45-53ef5ca3ce03/planNotebook_state.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/111e0f8a-f978-eb3b-1e45-53ef5ca3ce03/toolkit_activeGroups.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/131ccbff-14b6-a87a-9b87-cdadf65b10a2/agent_meta.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/131ccbff-14b6-a87a-9b87-cdadf65b10a2/memory_messages.hash" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/131ccbff-14b6-a87a-9b87-cdadf65b10a2/memory_messages.jsonl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/131ccbff-14b6-a87a-9b87-cdadf65b10a2/planNotebook_state.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/131ccbff-14b6-a87a-9b87-cdadf65b10a2/toolkit_activeGroups.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/1ff1d549-5001-8e1b-26de-33b33af8cc3e/agent_meta.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/1ff1d549-5001-8e1b-26de-33b33af8cc3e/memory_messages.hash" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/1ff1d549-5001-8e1b-26de-33b33af8cc3e/memory_messages.jsonl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/1ff1d549-5001-8e1b-26de-33b33af8cc3e/planNotebook_state.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/1ff1d549-5001-8e1b-26de-33b33af8cc3e/toolkit_activeGroups.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/5e71cca0-cf5d-58d2-f543-394161f8b01d/agent_meta.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/5e71cca0-cf5d-58d2-f543-394161f8b01d/memory_messages.hash" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/5e71cca0-cf5d-58d2-f543-394161f8b01d/memory_messages.jsonl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/5e71cca0-cf5d-58d2-f543-394161f8b01d/planNotebook_state.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/5e71cca0-cf5d-58d2-f543-394161f8b01d/toolkit_activeGroups.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/8177f116-ecdf-4b84-acc7-4520768d4da2/agent_meta.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/8177f116-ecdf-4b84-acc7-4520768d4da2/memory_messages.hash" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/8177f116-ecdf-4b84-acc7-4520768d4da2/memory_messages.jsonl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/8177f116-ecdf-4b84-acc7-4520768d4da2/planNotebook_state.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/8177f116-ecdf-4b84-acc7-4520768d4da2/toolkit_activeGroups.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/a5b3a5eb-002b-4e6f-acad-1530dec66716/agent_meta.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/a5b3a5eb-002b-4e6f-acad-1530dec66716/memory_messages.hash" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/a5b3a5eb-002b-4e6f-acad-1530dec66716/memory_messages.jsonl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/a5b3a5eb-002b-4e6f-acad-1530dec66716/planNotebook_state.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/a5b3a5eb-002b-4e6f-acad-1530dec66716/toolkit_activeGroups.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/add06152-eb39-d44c-5c7f-ea9206527513/agent_meta.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/add06152-eb39-d44c-5c7f-ea9206527513/memory_messages.hash" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/add06152-eb39-d44c-5c7f-ea9206527513/memory_messages.jsonl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/add06152-eb39-d44c-5c7f-ea9206527513/planNotebook_state.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/add06152-eb39-d44c-5c7f-ea9206527513/toolkit_activeGroups.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/c33e9b4c-155e-fd67-2800-6668c689b80d/agent_meta.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/c33e9b4c-155e-fd67-2800-6668c689b80d/memory_messages.hash" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/c33e9b4c-155e-fd67-2800-6668c689b80d/memory_messages.jsonl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/c33e9b4c-155e-fd67-2800-6668c689b80d/planNotebook_state.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory/sessions/c33e9b4c-155e-fd67-2800-6668c689b80d/toolkit_activeGroups.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/service/AgentRunService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/service/AgentRunService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/conversation/model/ConversationMeta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/conversation/model/ConversationMeta.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/conversation/model/UiMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/conversation/model/UiMessage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/conversation/service/ChatHistoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/conversation/service/ChatHistoryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/conversation/service/ConversationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/conversation/service/ConversationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/service/impl/WebSocketServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/service/impl/WebSocketServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/websocket/dto/DialogMessageDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/websocket/dto/DialogMessageDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/prompt/PromptManagement.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/prompt/PromptManagement.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -226,7 +180,7 @@
       <workItem from="1779088144967" duration="12338000" />
       <workItem from="1779113442646" duration="1432000" />
       <workItem from="1779152164177" duration="2376000" />
-      <workItem from="1779154550810" duration="14202000" />
+      <workItem from="1779154550810" duration="19495000" />
     </task>
     <task id="LOCAL-00001" summary="-feat: add browser agent">
       <option name="closed" value="true" />
@@ -252,7 +206,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779107763894</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="feat: add README.md file">
+      <option name="closed" value="true" />
+      <created>1779182763849</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1779182763849</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -276,6 +238,7 @@
     <MESSAGE value="-feat: add browser agent" />
     <MESSAGE value="-fix: browser agent" />
     <MESSAGE value="feat(agent): 增加执行过程追踪与停止控制&#10;&#10;- 新增 Agent 执行注册表与运行句柄，跟踪当前会话任务&#10;- 支持 WebSocket stop 指令，中断正在运行的 PlannerAgent 和 BrowserAgent&#10;- 停止时释放 stream、取消 Future，并清理浏览器运行时&#10;- 增加规划、工具调用、浏览器委派、摘要和最终回答等 trace 事件&#10;- 前端支持执行步骤面板、answer_delta 流式输出、停止状态和停止按钮&#10;- 清理已关闭的 BrowserAgentRuntime，避免复用已停止的浏览器会话" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(agent): 增加执行过程追踪与停止控制&#10;&#10;- 新增 Agent 执行注册表与运行句柄，跟踪当前会话任务&#10;- 支持 WebSocket stop 指令，中断正在运行的 PlannerAgent 和 BrowserAgent&#10;- 停止时释放 stream、取消 Future，并清理浏览器运行时&#10;- 增加规划、工具调用、浏览器委派、摘要和最终回答等 trace 事件&#10;- 前端支持执行步骤面板、answer_delta 流式输出、停止状态和停止按钮&#10;- 清理已关闭的 BrowserAgentRuntime，避免复用已停止的浏览器会话" />
+    <MESSAGE value="feat: add README.md file" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add README.md file" />
   </component>
 </project>
