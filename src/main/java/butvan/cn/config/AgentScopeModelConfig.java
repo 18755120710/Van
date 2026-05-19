@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AgentScopeModelConfig {
 
-    @Bean
+//    @Bean
     public Model mainModel(AgentScopeProperties agentScopeProperties) {
         return DashScopeChatModel.builder()
                 .apiKey(agentScopeProperties.getModel().getApiKey())

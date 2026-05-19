@@ -70,6 +70,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
                 .modelName(defaultIfBlank(request.getModelName(), old_config.getModelName()))
                 .apiKey(defaultIfBlank(request.getApiKey(), old_config.getApiKey()))
                 .stream(request.getStream() == null ? old_config.getStream() : request.getStream())
+                .temperature(request.getTemperature() == null ? old_config.getTemperature() : request.getTemperature())
                 .maxTokens(request.getMaxTokens() == null ? old_config.getMaxTokens() : request.getMaxTokens())
                 .updatedAt(System.currentTimeMillis())
                 .build();
