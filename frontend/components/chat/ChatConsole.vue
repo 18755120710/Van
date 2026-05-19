@@ -16,7 +16,7 @@
           </svg>
         </button>
         <div class="session-info">
-          <h2 class="session-title">Main Orchestration Console</h2>
+          <h2 class="session-title">{{ activeConversation?.title || '新对话' }}</h2>
           <p class="session-subtitle">Interactive Web Automation Agent</p>
         </div>
       </div>
@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, computed } from 'vue'
 import { useStomp } from '~/composables/useStomp'
 import WelcomeGrid from '~/components/chat/WelcomeGrid.vue'
 import ChatBubble from '~/components/chat/ChatBubble.vue'
@@ -83,7 +83,11 @@ const messagesContainer = ref<HTMLElement | null>(null)
 const inputPanelRef = ref<InstanceType<typeof InputPanel> | null>(null)
 
 // Load Stomp hooks
-const { messages, isConnected, connect, disconnect } = useStomp()
+const { messages, isConnected, connect, disconnect, activeConversationId, conversations } = useStomp()
+
+const activeConversation = computed(() => {
+  return conversations.value.find(c => c.conversationId === activeConversationId.value)
+})
 
 // Prefill text into input field
 const handleSelectPrompt = (text: string) => {
