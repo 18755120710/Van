@@ -29,7 +29,7 @@ public class PromptConfigServiceImpl implements PromptConfigService {
      private String defaultPromptLocale;
 
      // 用户自定义 prompt 目录
-     @Value("${agent-config.prompt-dir:./agent-config/prompts}")
+     @Value("${agent-config.prompt-dir:./data/agent-config/prompts}")
      private String customPromptDir;
 
     /**
@@ -40,7 +40,7 @@ public class PromptConfigServiceImpl implements PromptConfigService {
     public List<PromptInfo> listPrompt() {
         try {
             PathMatchingResourcePatternResolver loader = new PathMatchingResourcePatternResolver();
-            Resource[] resources = loader.getResources(defaultPromptLocale);
+            Resource[] resources = loader.getResources(defaultPromptPattern());
 
             return List.of(resources)
                     .stream()
@@ -248,6 +248,14 @@ public class PromptConfigServiceImpl implements PromptConfigService {
         }
 
         return normalized;
+    }
+
+    /**
+     * 默认 prompt 的扫描表达式
+     * @return
+     */
+    private String defaultPromptPattern() {
+        return StrUtil.format("classpath:{}/*.txt",defaultPromptLocale);
     }
 
     /**

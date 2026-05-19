@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="feat: add README.md file">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="fix: success PromptConfigServiceImpl">
       <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/impl/PromptConfigServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/impl/PromptConfigServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -174,7 +174,7 @@
       <workItem from="1779113442646" duration="1432000" />
       <workItem from="1779152164177" duration="2376000" />
       <workItem from="1779154550810" duration="19495000" />
-      <workItem from="1779192424386" duration="1927000" />
+      <workItem from="1779192424386" duration="2352000" />
     </task>
     <task id="LOCAL-00001" summary="-feat: add browser agent">
       <option name="closed" value="true" />
@@ -208,7 +208,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779182763849</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="fix: success PromptConfigServiceImpl">
+      <option name="closed" value="true" />
+      <created>1779194390949</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1779194390949</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -233,6 +241,7 @@
     <MESSAGE value="-fix: browser agent" />
     <MESSAGE value="feat(agent): 增加执行过程追踪与停止控制&#10;&#10;- 新增 Agent 执行注册表与运行句柄，跟踪当前会话任务&#10;- 支持 WebSocket stop 指令，中断正在运行的 PlannerAgent 和 BrowserAgent&#10;- 停止时释放 stream、取消 Future，并清理浏览器运行时&#10;- 增加规划、工具调用、浏览器委派、摘要和最终回答等 trace 事件&#10;- 前端支持执行步骤面板、answer_delta 流式输出、停止状态和停止按钮&#10;- 清理已关闭的 BrowserAgentRuntime，避免复用已停止的浏览器会话" />
     <MESSAGE value="feat: add README.md file" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add README.md file" />
+    <MESSAGE value="fix: success PromptConfigServiceImpl" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: success PromptConfigServiceImpl" />
   </component>
 </project>

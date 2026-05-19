@@ -18,7 +18,7 @@ data:
 prompt:
   locale: /prompt
 agent-config:
-  prompt-dir: ./agent-config/prompts
+  prompt-dir: ./data/agent-config/prompts
 
 file:
   base: /temp/my-manus-agentscope
