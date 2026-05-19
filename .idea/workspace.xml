@@ -5,15 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="feat: add README.md file">
-      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/model/PromptContent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/model/PromptInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/model/UpdatePromptRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/PromptConfigService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/impl/PromptConfigServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/controller/AgentConfigController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/prompt/PromptManagement.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/prompt/PromptManagement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/impl/PromptConfigServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/impl/PromptConfigServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,16 +25,16 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "18755120710"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;18755120710&quot;
   }
-}]]></component>
+}</component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
     "url": "https://github.com/18755120710/Van.git",
-    "accountId": "104054c9-8baa-47d2-9f77-dd18c1df299a"
+    "accountId": "4785d42f-40c8-4162-b38a-aeb68370ccdd"
   }
 }]]></component>
   <component name="KubernetesApiPersistence">{}</component>
@@ -84,7 +77,7 @@
     "npm.dev.executor": "Run",
     "npm.nuxt-client.executor": "Run",
     "npm.run.executor": "Run",
-    "project.structure.last.edited": "项目",
+    "project.structure.last.edited": "模块",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.0",
     "run.code.analysis.last.selected.profile": "pProject Default",
@@ -121,7 +114,7 @@
         <entry key="js.build_tools.npm">
           <value>
             <map>
-              <entry key="nuxt-client" value="STOPPED" />
+              <entry key="nuxt-client" value="FAILED" />
             </map>
           </value>
         </entry>
@@ -181,6 +174,7 @@
       <workItem from="1779113442646" duration="1432000" />
       <workItem from="1779152164177" duration="2376000" />
       <workItem from="1779154550810" duration="19495000" />
+      <workItem from="1779192424386" duration="1927000" />
     </task>
     <task id="LOCAL-00001" summary="-feat: add browser agent">
       <option name="closed" value="true" />
