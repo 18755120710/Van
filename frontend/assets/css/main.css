@@ -1687,3 +1687,111 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateX(-260px);
   }
 }
+
+/* 新建对话按钮 */
+.new-chat-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0.5rem 0.25rem 0.5rem;
+  padding: 0.6rem 1rem;
+  background: var(--text-primary);
+  color: #ffffff;
+  border: 1px solid var(--text-primary);
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.new-chat-btn:hover {
+  background: var(--accent-blue-hover);
+  border-color: var(--accent-blue-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.new-chat-btn:active {
+  transform: translateY(0);
+}
+
+.new-chat-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* 历史会话列表 */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 0.25rem 0.5rem;
+}
+
+.history-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.65rem;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.history-item:hover {
+  background: var(--bg-active);
+}
+
+.history-item.active {
+  background: var(--bg-active);
+  font-weight: 550;
+}
+
+.history-item-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+.history-item.active .history-item-icon {
+  color: var(--text-primary);
+}
+
+.history-item-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.history-item-title {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-item.active .history-item-title {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.history-item-time {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
