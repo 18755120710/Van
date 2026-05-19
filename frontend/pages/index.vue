@@ -19,10 +19,11 @@ import ChatConsole from '~/components/chat/ChatConsole.vue'
 import SidebarRight from '~/components/sidebar/SidebarRight.vue'
 
 const isSidebarCollapsed = ref(false)
-const { connect, disconnect } = useStomp()
+const { connect, disconnect, initSession } = useStomp()
 
 // Connect to WebSocket STOMP broker when mounted
-onMounted(() => {
+onMounted(async () => {
+  await initSession()
   connect()
 })
 
