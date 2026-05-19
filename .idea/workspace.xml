@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="fix: success PromptConfigServiceImpl">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/composables/useView.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/composables/useView.ts" afterDir="false" />
+    <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="feat: 优化前端项目">
+      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/model/AgentModelConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/model/AgentModelConfigView.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/model/UpdateModelConfigRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -216,7 +218,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779194390949</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="feat: 优化前端项目">
+      <option name="closed" value="true" />
+      <created>1779195558953</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1779195558953</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -242,6 +252,7 @@
     <MESSAGE value="feat(agent): 增加执行过程追踪与停止控制&#10;&#10;- 新增 Agent 执行注册表与运行句柄，跟踪当前会话任务&#10;- 支持 WebSocket stop 指令，中断正在运行的 PlannerAgent 和 BrowserAgent&#10;- 停止时释放 stream、取消 Future，并清理浏览器运行时&#10;- 增加规划、工具调用、浏览器委派、摘要和最终回答等 trace 事件&#10;- 前端支持执行步骤面板、answer_delta 流式输出、停止状态和停止按钮&#10;- 清理已关闭的 BrowserAgentRuntime，避免复用已停止的浏览器会话" />
     <MESSAGE value="feat: add README.md file" />
     <MESSAGE value="fix: success PromptConfigServiceImpl" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: success PromptConfigServiceImpl" />
+    <MESSAGE value="feat: 优化前端项目" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: 优化前端项目" />
   </component>
 </project>
