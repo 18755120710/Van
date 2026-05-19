@@ -13,6 +13,16 @@
 
       <!-- Sleek Input Box -->
       <div class="input-box-wrapper" :class="{ 'disabled': disableInput }">
+        <!-- Model Name Badge -->
+        <div v-if="activeModel" class="model-badge" title="当前连接的智能体模型">
+          <svg class="model-badge-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polygon points="12 2 2 7 12 12 22 7 12 2" />
+            <polyline points="2 17 12 22 22 17" />
+            <polyline points="2 12 12 17 22 12" />
+          </svg>
+          <span class="model-badge-text">{{ activeModel }}</span>
+        </div>
+
         <input
           ref="inputField"
           type="text"
@@ -60,13 +70,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useStomp } from '~/composables/useStomp'
+import { useAgentConfig } from '~/composables/useAgentConfig'
 
 const newMessage = ref('')
 const inputField = ref<HTMLInputElement | null>(null)
+const activeModel = ref('')
 
 const { disableInput, stopping, sendMessage: sendStompMessage, stopAgent } = useStomp()
+const { getModelConfig } = useAgentConfig()
+
+// Pull the currently active model name from backend configuration
+onMounted(async () => {
+  try {
+    const data = await getModelConfig()
+    if (data && data.modelName) {
+      activeModel.value = data.modelName
+    }
+  } catch (err) {
+    console.warn('Could not fetch active model for input panel badge:', err)
+  }
+})
 
 const handleSend = () => {
   const text = newMessage.value.trim()
@@ -93,3 +118,44 @@ defineExpose({
   prefillPrompt
 })
 </script>
+
+<style scoped>
+.model-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.55rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  margin-left: 0.25rem;
+  flex-shrink: 0;
+  height: 26px;
+  user-select: none;
+  animation: badgeFadeIn 0.25s ease-out;
+}
+
+.model-badge-icon {
+  width: 12px;
+  height: 12px;
+  color: var(--accent-indigo);
+}
+
+.model-badge-text {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+@keyframes badgeFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+</style>
