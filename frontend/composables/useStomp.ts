@@ -271,6 +271,12 @@ export const useStomp = () => {
   const initSession = async () => {
     if (import.meta.server) return
     let storedId = localStorage.getItem('activeConversationId')
+    
+    // Filter out potential invalid string representations of null or undefined
+    if (storedId === 'null' || storedId === 'undefined') {
+      storedId = null
+    }
+
     if (storedId) {
       activeConversationId.value = storedId
     } else {
@@ -326,9 +332,36 @@ export const useStomp = () => {
     await loadMessages(conversationId)
   }
 
-  const sendMessage = (text: string) => {
+  const sendMessage = async (text: string) => {
     if (!stompClient || !isConnected.value) {
       console.warn('STOMP client not connected, cannot send message')
+      return
+    }
+
+    // Double check that activeConversationId is not null. If it is null, create it immediately.
+    if (!activeConversationId.value) {
+      console.warn('activeConversationId is null in sendMessage, attempting to create one now...')
+      try {
+        const res = await fetch(`${BASE_URL}/conversations`, {
+          method: 'POST'
+        })
+        if (res.ok) {
+          const data = await res.json()
+          const newId = data.conversationId
+          if (newId) {
+            activeConversationId.value = newId
+            localStorage.setItem('activeConversationId', newId)
+            await loadConversations()
+          }
+        }
+      } catch (e) {
+        console.error('Failed to auto-create conversation in sendMessage:', e)
+      }
+    }
+
+    // If still null, report error and return to prevent sending null payload
+    if (!activeConversationId.value) {
+      console.error('Aborting sendMessage: activeConversationId is still null.')
       return
     }
 
