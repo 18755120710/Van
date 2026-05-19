@@ -5,11 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="feat: 优化前端项目">
-      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/AgentModelProvider.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/ModelConfigService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/impl/ModelConfigServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,17 +97,16 @@
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
-        <option value="SpringBootApplicationConfigurationType" />
         <option value="js.build_tools.npm" />
       </set>
     </option>
-    <option name="hiddenConfigurations">
+    <option name="configurationStatuses">
       <map>
-        <entry key="SpringBootApplicationConfigurationType">
+        <entry key="js.build_tools.npm">
           <value>
-            <set>
-              <option value="AgentApplication" />
-            </set>
+            <map>
+              <entry key="nuxt-client" value="STOPPED" />
+            </map>
           </value>
         </entry>
       </map>
