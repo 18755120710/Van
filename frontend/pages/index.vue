@@ -3,9 +3,9 @@
     <!-- Left collapsible navigation console -->
     <SidebarLeft v-model:collapsed="isSidebarCollapsed" />
 
-    <!-- Center active chat viewbox or Prompt Management panel -->
+    <!-- Center active chat viewbox or Settings panel -->
     <ChatConsole v-if="currentView === 'chat'" v-model:sidebar-collapsed="isSidebarCollapsed" />
-    <PromptManager v-else-if="currentView === 'prompt'" v-model:sidebar-collapsed="isSidebarCollapsed" />
+    <SettingsConsole v-else-if="currentView === 'settings'" v-model:sidebar-collapsed="isSidebarCollapsed" />
 
     <!-- Right step logs drawer (only visible in chat view) -->
     <SidebarRight v-if="currentView === 'chat'" />
@@ -18,7 +18,7 @@ import { useStomp } from '~/composables/useStomp'
 import { useView } from '~/composables/useView'
 import SidebarLeft from '~/components/sidebar/SidebarLeft.vue'
 import ChatConsole from '~/components/chat/ChatConsole.vue'
-import PromptManager from '~/components/agent/PromptManager.vue'
+import SettingsConsole from '~/components/settings/SettingsConsole.vue'
 import SidebarRight from '~/components/sidebar/SidebarRight.vue'
 
 const isSidebarCollapsed = ref(false)
