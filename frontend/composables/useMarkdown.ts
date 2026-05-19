@@ -52,6 +52,17 @@ export const useMarkdown = () => {
   // Click delegation event handler for Markdown code block buttons
   const handleBlockClick = (event: MouseEvent) => {
     const target = event.target as HTMLElement
+    
+    // Handle image click to view full size
+    const img = target.closest('img')
+    if (img) {
+      const src = img.getAttribute('src')
+      if (src) {
+        window.open(src, '_blank')
+      }
+      return
+    }
+
     const button = target.closest('.code-action-btn') as HTMLButtonElement | null
     if (!button) return
 

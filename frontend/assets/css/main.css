@@ -1076,6 +1076,25 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Premium Markdown Typography & Elements Styles */
+.message-text img {
+  max-width: 100%;
+  height: auto;
+  max-height: 480px;
+  border-radius: var(--radius-md);
+  margin: 0.75rem 0;
+  display: block;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  object-fit: contain;
+  cursor: zoom-in;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
+}
+
+.message-text img:hover {
+  transform: scale(1.015);
+  box-shadow: var(--shadow-md);
+}
+
 .message-text p {
   margin: 0 0 0.8rem 0;
   line-height: 1.65;
