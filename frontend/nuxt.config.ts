@@ -12,5 +12,13 @@ export default defineNuxtConfig({
   },
   experimental: {
     viteEnvironmentApi: true
+  },
+  nitro: {
+    devProxy: {
+      '/conversations': {
+        target: 'http://localhost:18081/conversations',
+        changeOrigin: true
+      }
+    }
   }
 })

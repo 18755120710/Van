@@ -235,7 +235,7 @@ export const useStomp = () => {
     }
   }
 
-  const BASE_URL = 'http://localhost:18081'
+  const BASE_URL = ''
 
   const loadConversations = async () => {
     try {
