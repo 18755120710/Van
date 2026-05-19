@@ -1,4 +1,4 @@
-package butvan.cn.domain.meta;
+package butvan.cn.conversation.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +17,9 @@ public class ConversationMeta {
     // 历史列表标题
     private String title;
 
+    // 是否已生成过只能标题
+    private Boolean titleGenerated;
+
     // 会话创建时间
     private Long createAt;
 
@@ -25,4 +28,6 @@ public class ConversationMeta {
 
     // 消息数量
     private Integer messageCount;
+
+    private Boolean deleted;
 }

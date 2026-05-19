@@ -4,6 +4,9 @@ import butvan.cn.agent.browser.runtime.AgentExecutionHandle;
 import butvan.cn.agent.browser.runtime.AgentExecutionRegistry;
 import butvan.cn.agent.service.AgentRunService;
 import butvan.cn.common.security.SessionIdSanitizer;
+import butvan.cn.conversation.model.UiMessage;
+import butvan.cn.conversation.service.ChatHistoryService;
+import butvan.cn.conversation.service.ConversationService;
 import butvan.cn.service.WebSocketService;
 import butvan.cn.websocket.dto.DialogMessageDTO;
 import butvan.cn.websocket.session.MessageSession;
@@ -33,11 +36,17 @@ public class WebSocketServiceImpl implements WebSocketService
 
     private final AgentExecutionRegistry agentExecutionRegistry;
 
+    private final ChatHistoryService chatHistoryService;
+
+    private final ConversationService conversationService;
 
     @Override
     public void enhancedDialog(DialogMessageDTO message, SimpMessageHeaderAccessor headerAccessor) {
 
         String session_id = SessionIdSanitizer.requireSafe(headerAccessor.getSessionId());
+
+        // 业务会话 id
+        String conversation_id = message.getConversationId();
 
         MessageSession ws_session = this.sessionManager.getSession(session_id);
 
@@ -63,6 +72,18 @@ public class WebSocketServiceImpl implements WebSocketService
             return;
         }
 
+        // 用户第一次发送消息的时候，初始化设置标题
+        conversationService.initTitleIfNecessary(conversation_id,message.getText());
+
+        // 保存用户消息到 ui 历史
+        chatHistoryService.appendMessage(conversation_id, UiMessage.builder()
+                        .id(UUID.randomUUID().toString())
+                        .conversationId(conversation_id)
+                        .type(DialogMessageDTO.TYPE_USER)
+                        .text(message.getText())
+                        .createAt(System.currentTimeMillis())
+                .build());
+
         ws_session.receiveMessage(message);
 
         String trace_id = UUID.randomUUID().toString();
@@ -70,7 +91,7 @@ public class WebSocketServiceImpl implements WebSocketService
         agentExecutionRegistry.register(session_id,handle);
 
         Future<?> future = agentTaskExecutor.submit(() -> {
-            agentRunService.run(ws_session, trace_id, handle);
+            agentRunService.run(ws_session, conversation_id ,trace_id, handle);
         });
         handle.setFuture(future);
     }

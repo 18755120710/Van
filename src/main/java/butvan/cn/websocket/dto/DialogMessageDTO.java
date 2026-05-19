@@ -21,6 +21,27 @@ public class DialogMessageDTO {
     private String openUrl;
 
     /**
+     * 业务会话 ID。
+     *
+     * 注意：
+     * 这个 ID 不是 WebSocket sessionId。
+     *
+     * WebSocket sessionId 会在刷新页面、断线重连时变化；
+     * conversationId 应该在同一个聊天会话中保持不变。
+     *
+     * 后续 AgentScope 的 JsonSession 会使用这个 ID 作为 sessionId，
+     * 从而实现刷新页面后仍然能读取旧记忆。
+     */
+    private String conversationId;
+
+    /**
+     * 消息创建时间，毫秒时间戳。
+     *
+     * 主要用于前端排序和展示时间。
+     */
+    private Long createdAt;
+
+    /**
      * 本次用户提问对应的一次 Agent 执行 ID。
      *
      * 一次用户问题会产生多条过程消息：

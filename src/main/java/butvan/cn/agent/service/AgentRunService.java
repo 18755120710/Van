@@ -5,6 +5,8 @@ import butvan.cn.agent.browser.runtime.AgentExecutionRegistry;
 import butvan.cn.agent.planner.PlannerAgentFactory;
 import butvan.cn.agent.trace.TraceContextRegistry;
 import butvan.cn.common.security.SessionIdSanitizer;
+import butvan.cn.conversation.model.UiMessage;
+import butvan.cn.conversation.service.ChatHistoryService;
 import butvan.cn.websocket.dto.DialogMessageDTO;
 import butvan.cn.websocket.session.MessageSession;
 import io.agentscope.core.ReActAgent;
@@ -30,11 +32,12 @@ public class AgentRunService {
     private final PlannerAgentFactory plannerAgentFactory;
     private final TraceContextRegistry traceContextRegistry;
     private final AgentExecutionRegistry agentExecutionRegistry;
+    private final ChatHistoryService chatHistoryService;
 
     @Value("${memory.session-dir:./memory/sessions}")
     private String memorySessionDir;
 
-    public void run(MessageSession session, String traceId, AgentExecutionHandle handle) {
+    public void run(MessageSession session, String conversationId ,String traceId, AgentExecutionHandle handle) {
         String task = session.readMessage();
 
         traceContextRegistry.setCurrentTraceId(session.getSessionId(), traceId);
@@ -48,7 +51,7 @@ public class AgentRunService {
 
         // 保存并加载会话记忆
         SessionManager memory_session_manager = SessionManager
-                .forSessionId(safe_session_id)
+                .forSessionId(conversationId)
                 .withSession(new JsonSession(Path.of(memorySessionDir)))
                 .addComponent(agent);
         memory_session_manager.loadIfExists();
@@ -56,6 +59,8 @@ public class AgentRunService {
         try {
 
             AtomicBoolean answer_started = new AtomicBoolean(false);
+            // 积累流式回答
+            StringBuilder answer_buffer = new StringBuilder();
 
             // 配置流失事件类型
             StreamOptions stream_options = StreamOptions.builder()
@@ -92,6 +97,8 @@ public class AgentRunService {
                     // 标识模型还在生成回答
                     if (!text.isBlank()) {
                         answer_started.set(true);
+                        // 累计流式文本
+                        answer_buffer.append(text);
                         session.sendMessage(DialogMessageDTO.builder()
                                 .type(DialogMessageDTO.TYPE_SERVER)
                                 .traceId(traceId)
@@ -106,7 +113,7 @@ public class AgentRunService {
                 }
                 if (type == EventType.AGENT_RESULT) {
                     // 标识agent最终结果
-                    String final_text = answer_started.get() ? "" : text;
+                    String final_text = answer_started.get() ? answer_buffer.toString() : text;
 
                     session.sendMessage(DialogMessageDTO.builder()
                             .type(DialogMessageDTO.TYPE_SERVER)
@@ -117,6 +124,21 @@ public class AgentRunService {
                             .done(true)
                             .text(final_text)
                             .build());
+
+                    // 保存 agent 最终回答
+                    if (final_text != null && !final_text.isBlank()) {
+                        chatHistoryService.appendMessage(
+                                conversationId,
+                                UiMessage.builder()
+                                        .id(UUID.randomUUID().toString())
+                                        .conversationId(conversationId)
+                                        .type(DialogMessageDTO.TYPE_SERVER)
+                                        .traceId(traceId)
+                                        .text(final_text)
+                                        .createAt(System.currentTimeMillis())
+                                        .build()
+                        );
+                    }
                     return;
                 }
                 if (type == EventType.SUMMARY) {
