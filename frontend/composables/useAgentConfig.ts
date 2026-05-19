@@ -1,4 +1,4 @@
-import type { PromptInfo, PromptContent } from '~/types/agentConfig'
+import type { PromptInfo, PromptContent, AgentModelConfigView, UpdateModelConfigRequest } from '~/types/agentConfig'
 
 export const useAgentConfig = () => {
   const BASE_URL = '/agent-config'
@@ -43,10 +43,34 @@ export const useAgentConfig = () => {
     return await res.json()
   }
 
+  const getModelConfig = async (): Promise<AgentModelConfigView> => {
+    const res = await fetch(`${BASE_URL}/model`)
+    if (!res.ok) {
+      throw new Error(`获取模型配置失败: ${res.statusText}`)
+    }
+    return await res.json()
+  }
+
+  const updateModelConfig = async (payload: UpdateModelConfigRequest): Promise<AgentModelConfigView> => {
+    const res = await fetch(`${BASE_URL}/model`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    if (!res.ok) {
+      throw new Error(`更新模型配置失败: ${res.statusText}`)
+    }
+    return await res.json()
+  }
+
   return {
     listPrompts,
     getPromptContent,
     savePrompt,
-    resetPrompt
+    resetPrompt,
+    getModelConfig,
+    updateModelConfig
   }
 }
