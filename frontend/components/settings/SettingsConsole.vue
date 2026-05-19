@@ -94,43 +94,137 @@
       <div v-else-if="activeTab === 'models'" class="settings-view">
         <header class="top-navbar">
           <div class="nav-left">
-            <h2 class="session-title">系统大模型服务对接</h2>
-            <p class="session-subtitle">集成 OpenAI 协议或本地开源模型提供端</p>
+            <h2 class="session-title">大模型参数配置</h2>
+            <p class="session-subtitle">控制系统在运行 Agent 推理对话时调用的模型提供端与凭证参数</p>
           </div>
         </header>
         <div class="settings-view-body">
-          <div class="settings-card">
-            <h3>提供商凭证</h3>
-            <p class="card-desc">配置平台在请求推理任务时调用的主流云端模型或本地端点参数。</p>
+          <!-- Banners -->
+          <div v-if="successMsgModel" class="alert-banner alert-success">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="alert-icon">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>{{ successMsgModel }}</span>
+          </div>
+
+          <div v-if="errorMsgModel" class="alert-banner alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="alert-icon">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{{ errorMsgModel }}</span>
+          </div>
+
+          <!-- Loading state -->
+          <div v-if="isLoadingModel" class="settings-loading-state">
+            <div class="spinner"></div>
+            <p>正在从后端拉取最新模型配置...</p>
+          </div>
+
+          <!-- Form Card -->
+          <div v-else class="settings-card">
+            <h3>提供商与模型凭证</h3>
+            <p class="card-desc">配置平台在请求推理任务时调用的主流云端模型或本地端点参数。保存后，将在下一轮新建 Agent 对话时生效。</p>
             
             <div class="form-group">
               <label>首选提供商 (Provider)</label>
-              <select class="form-select">
-                <option value="openai">OpenAI 兼容协议 (如 DeepSeek, GPT)</option>
-                <option value="ollama">Ollama 本地服务</option>
-                <option value="anthropic">Anthropic (Claude)</option>
-                <option value="huggingface">Hugging Face API</option>
-              </select>
+              <input 
+                type="text" 
+                v-model="provider" 
+                :disabled="isSavingModel" 
+                class="form-input" 
+                placeholder="例如 dashscope, openai, ollama" 
+              />
             </div>
 
             <div class="form-group">
               <label>接口地址 (Base URL)</label>
-              <input type="text" value="https://api.deepseek.com/v1" class="form-input font-mono" />
-              <span class="input-helper">本地部署或自定义代理中转时需修改此项</span>
+              <input 
+                type="text" 
+                v-model="baseUrl" 
+                :disabled="isSavingModel" 
+                class="form-input font-mono" 
+                placeholder="例如 https://dashscope.aliyuncs.com/compatible-mode/v1" 
+              />
+              <span class="input-helper">第三方推理端点或本地托管端口 (如 http://localhost:11434/v1)</span>
             </div>
 
             <div class="form-group">
               <label>鉴权密钥 (API Key)</label>
-              <input type="password" value="sk-••••••••••••••••••••••••" class="form-input font-mono" />
+              <input 
+                type="password" 
+                v-model="apiKey" 
+                :disabled="isSavingModel" 
+                class="form-input font-mono" 
+                :placeholder="apiKeyMasked || '请在此输入您的 API Key'" 
+              />
+              <span class="input-helper">注：此处出于安全考虑，若不输入新 Key，留空提交将默认保留上次配置的密钥。</span>
             </div>
 
             <div class="form-group">
-              <label>智能体模型 (Agent Chat Model)</label>
-              <input type="text" value="deepseek-chat" class="form-input font-mono" />
+              <label>智能体模型 (Model Name)</label>
+              <input 
+                type="text" 
+                v-model="modelName" 
+                :disabled="isSavingModel" 
+                class="form-input font-mono" 
+                placeholder="例如 qwen3.5-122b-a10b" 
+              />
+            </div>
+
+            <div class="form-group flex-row">
+              <div class="flex-row-text">
+                <label>流式传输响应 (Stream)</label>
+                <span class="input-helper">开启此项时，Agent 对话回复会以流式块的形式增量输出</span>
+              </div>
+              <input 
+                type="checkbox" 
+                v-model="stream" 
+                :disabled="isSavingModel" 
+                class="form-switch" 
+              />
+            </div>
+
+            <div class="form-group">
+              <label>思维温度 (Temperature): {{ temperature }}</label>
+              <input 
+                type="range" 
+                min="0" 
+                max="2" 
+                step="0.1" 
+                v-model="temperature" 
+                :disabled="isSavingModel" 
+                class="form-range" 
+              />
+              <span class="input-helper">数值越大，回答创造力与多样性越高；数值趋近于 0 则更趋保守。范围在 0 到 2 之间。</span>
+            </div>
+
+            <div class="form-group">
+              <label>单次最大响应 Token 数 (Max Tokens)</label>
+              <input 
+                type="number" 
+                v-model="maxTokens" 
+                :disabled="isSavingModel" 
+                class="form-input font-mono" 
+                placeholder="例如 8192" 
+              />
+              <span class="input-helper">硬性限制单次对话回复的最大生成字词长度</span>
             </div>
 
             <div class="form-actions-row">
-              <button class="btn btn-primary" type="button" @click="mockSave">保存服务配置</button>
+              <button 
+                class="btn btn-primary" 
+                type="button" 
+                :disabled="isSavingModel" 
+                @click="handleSaveModelConfig"
+              >
+                <svg v-if="isSavingModel" class="btn-spinner" viewBox="0 0 24 24">
+                  <circle class="path" cx="12" cy="12" r="10" fill="none" stroke-width="3" stroke="currentColor"></circle>
+                </svg>
+                <span>{{ isSavingModel ? '正在保存...' : '保存配置' }}</span>
+              </button>
             </div>
           </div>
         </div>
@@ -295,8 +389,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useStomp } from '~/composables/useStomp'
+import { useAgentConfig } from '~/composables/useAgentConfig'
+import type { UpdateModelConfigRequest } from '~/types/agentConfig'
 import PromptManager from '~/components/agent/PromptManager.vue'
 
 // Props & Emits
@@ -309,14 +405,122 @@ const emit = defineEmits<{
 }>()
 
 const { isConnected } = useStomp()
+const { getModelConfig, updateModelConfig } = useAgentConfig()
 
 // Selected tab in settings left menu
 const activeTab = ref<'prompts' | 'models' | 'preferences' | 'diagnostics' | 'about'>('prompts')
 
-// Simple alert for mockup buttons
+// Model form values
+const provider = ref('dashscope')
+const baseUrl = ref('')
+const modelName = ref('')
+const apiKey = ref('')
+const stream = ref(true)
+const temperature = ref(0.2)
+const maxTokens = ref(8192)
+
+// Model status values
+const apiKeyMasked = ref('')
+const isLoadingModel = ref(false)
+const isSavingModel = ref(false)
+const errorMsgModel = ref<string | null>(null)
+const successMsgModel = ref<string | null>(null)
+
+// Load model config
+const fetchModelConfig = async () => {
+  isLoadingModel.value = true
+  errorMsgModel.value = null
+  try {
+    const data = await getModelConfig()
+    provider.value = data.provider || 'dashscope'
+    baseUrl.value = data.baseUrl || ''
+    modelName.value = data.modelName || ''
+    apiKeyMasked.value = data.apiKeyMasked || ''
+    apiKey.value = '' // Clear input
+    stream.value = data.stream ?? true
+    temperature.value = data.temperature ?? 0.2
+    maxTokens.value = data.maxTokens ?? 8192
+  } catch (err: any) {
+    errorMsgModel.value = err.message || '获取模型配置失败'
+  } finally {
+    isLoadingModel.value = false
+  }
+}
+
+// Handle save
+const handleSaveModelConfig = async () => {
+  if (!provider.value.trim()) {
+    errorMsgModel.value = '模型服务提供商 (Provider) 不能为空'
+    return
+  }
+  if (!baseUrl.value.trim()) {
+    errorMsgModel.value = '接口地址 (Base URL) 不能为空'
+    return
+  }
+  if (!modelName.value.trim()) {
+    errorMsgModel.value = '智能体模型 (Model Name) 不能为空'
+    return
+  }
+  if (temperature.value < 0 || temperature.value > 2) {
+    errorMsgModel.value = '思维温度 (Temperature) 必须控制在 0 到 2 之间'
+    return
+  }
+  if (maxTokens.value <= 0) {
+    errorMsgModel.value = '最大响应 Token 数 (Max Tokens) 必须为正数'
+    return
+  }
+
+  isSavingModel.value = true
+  errorMsgModel.value = null
+  successMsgModel.value = null
+
+  try {
+    const payload: UpdateModelConfigRequest = {
+      provider: provider.value.trim(),
+      baseUrl: baseUrl.value.trim(),
+      modelName: modelName.value.trim(),
+      apiKey: apiKey.value.trim() || null, // If user didn't enter anything, submit null (backend retains old key)
+      stream: stream.value,
+      temperature: Number(temperature.value),
+      maxTokens: Number(maxTokens.value)
+    }
+
+    await updateModelConfig(payload)
+    successMsgModel.value = '模型配置已保存，将在下一轮 Agent 创建时生效。'
+    apiKey.value = '' // clear input
+    
+    // Reload model config to update the masked API Key and fields
+    await fetchModelConfig()
+
+    // Auto clear success message after 5 seconds
+    setTimeout(() => {
+      successMsgModel.value = null
+    }, 5000)
+  } catch (err: any) {
+    errorMsgModel.value = err.message || '保存模型配置失败'
+  } finally {
+    isSavingModel.value = false
+  }
+}
+
+// Mock save for other tab forms
 const mockSave = () => {
   alert('设置保存成功！(由于是Mock配置，更改已写入内存中演示)')
 }
+
+// Watch tab active view change to load config automatically
+watch(activeTab, (newTab) => {
+  if (newTab === 'models') {
+    fetchModelConfig()
+  }
+})
+
+// Load initially on mounted
+onMounted(() => {
+  if (activeTab.value === 'models') {
+    fetchModelConfig()
+  }
+})
 </script>
 
 <style scoped>
@@ -700,5 +904,106 @@ const mockSave = () => {
   background: var(--bg-secondary);
   border: 1px solid var(--border-light);
   color: var(--text-secondary);
+}
+
+/* --------------------------------------------- */
+/* Real Model Config Forms, Spinners and Banners */
+/* --------------------------------------------- */
+.alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.alert-success {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #065f46;
+}
+
+.alert-error {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #991b1b;
+}
+
+.alert-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.settings-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  gap: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.settings-loading-state p {
+  font-size: 0.82rem;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-light);
+  border-top-color: var(--text-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  margin-right: 0.15rem;
+  animation: spin 0.8s linear infinite;
+}
+
+.btn-spinner circle {
+  stroke-dasharray: 42;
+  stroke-dashoffset: 14;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.form-range {
+  width: 100%;
+  height: 6px;
+  background: var(--border-light);
+  border-radius: 3px;
+  outline: none;
+  margin: 0.5rem 0;
+  -webkit-appearance: none;
+}
+
+.form-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.form-range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
 }
 </style>
