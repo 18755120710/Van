@@ -3,6 +3,7 @@ package butvan.cn.agent.planner;
 import butvan.cn.agent.prompt.PromptManagement;
 import butvan.cn.agent.trace.AgentTraceHook;
 import butvan.cn.agent.trace.TraceContextRegistry;
+import butvan.cn.configcenter.service.AgentModelProvider;
 import butvan.cn.websocket.session.MessageSession;
 import io.agentscope.core.ReActAgent;
 import io.agentscope.core.memory.InMemoryMemory;
@@ -27,7 +28,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PlannerAgentFactory {
 
-    private final Model model;
+    //private final Model model;
+    private final AgentModelProvider agentModelProvider;
     private final PlannerToolkitFactory plannerToolkitFactory;
     private final PromptManagement promptManagement;
     private final TraceContextRegistry traceContextRegistry;
@@ -52,7 +54,7 @@ public class PlannerAgentFactory {
         return ReActAgent.builder()
                 .name("PlannerAgent")
                 .sysPrompt(sys_prompt)
-                .model(model)
+                .model(agentModelProvider.curentModel())
                 .memory(new InMemoryMemory())
                 .toolkit(toolkit)
                 .planNotebook(plan_note_book)

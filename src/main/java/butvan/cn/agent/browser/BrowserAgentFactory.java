@@ -4,6 +4,7 @@ package butvan.cn.agent.browser;
 import butvan.cn.agent.prompt.PromptManagement;
 import butvan.cn.agent.trace.AgentTraceHook;
 import butvan.cn.agent.trace.TraceContextRegistry;
+import butvan.cn.configcenter.service.AgentModelProvider;
 import butvan.cn.properties.AgentScopeProperties;
 import butvan.cn.websocket.session.MessageSession;
 import io.agentscope.core.ReActAgent;
@@ -17,8 +18,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BrowserAgentFactory {
 
-    private final Model model;
-
+    //private final Model model;
+    private final AgentModelProvider agentModelProvider;
     private final BrowserToolkitFactory browserToolkitFactory;
 
     private final PromptManagement promptManagement;
@@ -44,7 +45,7 @@ public class BrowserAgentFactory {
         return ReActAgent.builder()
                 .name("BrowserAgent")
                 .sysPrompt(sys_prompt)
-                .model(model)
+                .model(agentModelProvider.curentModel())
                 .memory(new InMemoryMemory())
                 .toolkit(toolkit)
                 .maxIters(agentScopeProperties.getReAct().getMaxIters())
@@ -59,7 +60,7 @@ public class BrowserAgentFactory {
         ReActAgent agent = ReActAgent.builder() // 开始构造 BrowserAgent
                 .name("BrowserAgent") // Agent 名称
                 .sysPrompt(sys_prompt) // BrowserAgent 系统提示词
-                .model(model) // 使用 Spring 注入的大模型
+                .model(agentModelProvider.curentModel()) // 使用 Spring 注入的大模型
                 .memory(new InMemoryMemory()) // 使用短期记忆
                 .toolkit(toolkitRuntime.toolkit()) // 使用带浏览器工具的 Toolkit
                 .hook(new AgentTraceHook(session,traceContextRegistry))
