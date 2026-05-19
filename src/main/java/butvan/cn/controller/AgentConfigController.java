@@ -1,8 +1,7 @@
 package butvan.cn.controller;
 
-import butvan.cn.configcenter.model.PromptContent;
-import butvan.cn.configcenter.model.PromptInfo;
-import butvan.cn.configcenter.model.UpdatePromptRequest;
+import butvan.cn.configcenter.model.*;
+import butvan.cn.configcenter.service.ModelConfigService;
 import butvan.cn.configcenter.service.PromptConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +17,7 @@ import java.util.List;
 public class AgentConfigController {
 
     private final PromptConfigService promptConfigService;
-
+    private final ModelConfigService modelConfigService;
     /**
      * 查询所有可管理的 prompt 列表。
      * @return prompt 列表
@@ -60,5 +59,26 @@ public class AgentConfigController {
     @PostMapping("/prompts/{key}/reset")
     public PromptContent resetPrompt(@PathVariable String key) {
         return promptConfigService.resetPrompt(key);
+    }
+
+    /**
+     * 查询当前模型配置。
+     * @return 当前模型配置展示对象
+     */
+    @GetMapping("/model")
+    public AgentModelConfigView getModelConfig() {
+        return modelConfigService.getConfigView();
+    }
+
+    /**
+     * 更新模型配置。
+     * @param request 前端提交的模型配置
+     * @return 更新后的模型配置展示对象
+     */
+    @PutMapping("/model")
+    public AgentModelConfigView updateModelConfig(
+            @RequestBody UpdateModelConfigRequest request
+    ) {
+        return modelConfigService.updateConfig(request);
     }
 }

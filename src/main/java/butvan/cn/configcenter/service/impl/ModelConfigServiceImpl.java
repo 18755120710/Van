@@ -103,6 +103,27 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         if (StrUtil.isBlank(config.getProvider())) {
             throw new IllegalArgumentException("provider cannot be blank");
         }
+
+        if (StrUtil.isBlank(config.getBaseUrl())) {
+            throw new IllegalArgumentException("baseUrl cannot be blank");
+        }
+
+        if (StrUtil.isBlank(config.getModelName())) {
+            throw new IllegalArgumentException("modelName cannot be blank");
+        }
+
+        if (StrUtil.isBlank(config.getApiKey())) {
+            throw new IllegalArgumentException("apiKey cannot be blank");
+        }
+
+        if (config.getTemperature() != null
+                && (config.getTemperature() < 0 || config.getTemperature() > 2)) {
+            throw new IllegalArgumentException("temperature must be between 0 and 2");
+        }
+
+        if (config.getMaxTokens() != null && config.getMaxTokens() <= 0) {
+            throw new IllegalArgumentException("maxTokens must be greater than 0");
+        }
     }
 
     private AgentModelConfigView toView(AgentModelConfig config) {
