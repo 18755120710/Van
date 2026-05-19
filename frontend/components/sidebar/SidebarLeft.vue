@@ -29,33 +29,61 @@
 
     <!-- Sidebar Navigation Options -->
     <nav class="sidebar-nav">
-      <!-- 新建对话按钮 -->
-      <button class="new-chat-btn" @click="handleNewChat" type="button" title="Create New Conversation">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
+      <!-- 视图切换选项 -->
+      <div class="nav-section-title">功能菜单</div>
+      <button 
+        class="nav-item" 
+        :class="{ 'active': currentView === 'chat' }"
+        @click="setView('chat')"
+        type="button"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
-        <span>新建对话</span>
+        <span>AI 智能对话</span>
       </button>
-      <div class="nav-section-title">历史会话</div>
-      <div class="history-list">
-        <button 
-          v-for="conv in conversations" 
-          :key="conv.conversationId"
-          class="history-item"
-          :class="{ 'active': activeConversationId === conv.conversationId }"
-          @click="handleSwitchConversation(conv.conversationId)"
-          type="button"
-        >
-          <svg class="history-item-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      <button 
+        class="nav-item" 
+        :class="{ 'active': currentView === 'prompt' }"
+        @click="setView('prompt')"
+        type="button"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+        </svg>
+        <span>Agent 配置 / Prompt 管理</span>
+      </button>
+
+      <!-- 对话模式特有部分 -->
+      <template v-if="currentView === 'chat'">
+        <!-- 新建对话按钮 -->
+        <button class="new-chat-btn" @click="handleNewChat" type="button" title="Create New Conversation">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          <div class="history-item-info">
-            <span class="history-item-title">{{ conv.title || '新对话' }}</span>
-            <span class="history-item-time">{{ formatRelativeTime(conv.updateAt) }}</span>
-          </div>
+          <span>新建对话</span>
         </button>
-      </div>
+        <div class="nav-section-title">历史会话</div>
+        <div class="history-list">
+          <button 
+            v-for="conv in conversations" 
+            :key="conv.conversationId"
+            class="history-item"
+            :class="{ 'active': activeConversationId === conv.conversationId }"
+            @click="handleSwitchConversation(conv.conversationId)"
+            type="button"
+          >
+            <svg class="history-item-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <div class="history-item-info">
+              <span class="history-item-title">{{ conv.title || '新对话' }}</span>
+              <span class="history-item-time">{{ formatRelativeTime(conv.updateAt) }}</span>
+            </div>
+          </button>
+        </div>
+      </template>
     </nav>
 
     <!-- Sidebar User Section -->
@@ -73,6 +101,7 @@
 
 <script setup lang="ts">
 import { useStomp } from '~/composables/useStomp'
+import { useView } from '~/composables/useView'
 
 // Props & Emits
 const emit = defineEmits<{
@@ -82,6 +111,8 @@ const emit = defineEmits<{
 const props = defineProps<{
   collapsed: boolean
 }>()
+
+const { currentView, setView } = useView()
 
 const { 
   isConnected, 
