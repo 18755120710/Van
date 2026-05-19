@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 import { Client } from '@stomp/stompjs'
 import type { Message, DialogMessageDTO, ConversationMeta, UiMessage } from '~/types/chat'
-import { useApi } from '~/composables/useApi'
 
 // Global singleton state so that WS state persists when switching pages/components
 const isConnected = ref(false)
@@ -34,7 +33,7 @@ export const useStomp = () => {
     // A. 处理 eventType === "stopped" 的情况 (覆盖 requirement 8, 16)
     if (dto.eventType === 'stopped') {
       let existingMsg = dto.traceId ? messages.value.find(m => m.type === 'server' && m.traceId === dto.traceId) : null
-      
+
       if (existingMsg) {
         existingMsg.streaming = false
         existingMsg.stopped = true
@@ -62,7 +61,7 @@ export const useStomp = () => {
     // 1. 优先判断 dto.traceId 以支持 Agent 执行过程消息
     if (dto.traceId) {
       let existingMsg = messages.value.find(m => m.type === 'server' && m.traceId === dto.traceId)
-      
+
       if (existingMsg) {
         // B. 如果 existingMsg.stopped === true，忽略后续非 answer/error/stopped 消息 (覆盖 requirement 17)
         if (existingMsg.stopped && dto.eventType !== 'answer' && dto.eventType !== 'error' && dto.eventType !== 'stopped') {
@@ -127,10 +126,10 @@ export const useStomp = () => {
           timestamp: getFormattedTime()
         })
         activeTraceMsgId.value = dto.traceId
-        
+
         // 关键特性：复杂轨迹事件自动拉开右侧思考面板
         isRightPanelOpen.value = true
-        
+
         if (dto.done === true) {
           msg.streaming = false
           disableInput.value = false
@@ -236,11 +235,14 @@ export const useStomp = () => {
     }
   }
 
-  const { conversationsApi } = useApi()
+  const BASE_URL = ''
 
   const loadConversations = async () => {
     try {
-      conversations.value = await conversationsApi.list()
+      const res = await fetch(`${BASE_URL}/conversations`)
+      if (res.ok) {
+        conversations.value = await res.json()
+      }
     } catch (e) {
       console.error('Failed to load conversations:', e)
     }
@@ -248,16 +250,19 @@ export const useStomp = () => {
 
   const loadMessages = async (conversationId: string) => {
     try {
-      const data = await conversationsApi.listMessages(conversationId)
-      messages.value = data.map((msg: UiMessage) => ({
-        type: msg.type,
-        text: msg.text || '',
-        traceId: msg.traceId,
-        imageUrl: msg.imageUrl,
-        fileUrl: msg.fileUrl,
-        openUrl: msg.openUrl,
-        streaming: false
-      }))
+      const res = await fetch(`${BASE_URL}/conversations/${conversationId}/messages`)
+      if (res.ok) {
+        const data: UiMessage[] = await res.json()
+        messages.value = data.map((msg: UiMessage) => ({
+          type: msg.type,
+          text: msg.text || '',
+          traceId: msg.traceId,
+          imageUrl: msg.imageUrl,
+          fileUrl: msg.fileUrl,
+          openUrl: msg.openUrl,
+          streaming: false
+        }))
+      }
     } catch (e) {
       console.error(`Failed to load messages for conversation ${conversationId}:`, e)
     }
@@ -266,7 +271,7 @@ export const useStomp = () => {
   const initSession = async () => {
     if (import.meta.server) return
     let storedId = localStorage.getItem('activeConversationId')
-    
+
     // Filter out potential invalid string representations of null or undefined
     if (storedId === 'null' || storedId === 'undefined') {
       storedId = null
@@ -276,11 +281,16 @@ export const useStomp = () => {
       activeConversationId.value = storedId
     } else {
       try {
-        const data = await conversationsApi.create()
-        storedId = data.conversationId
-        if (storedId) {
-          activeConversationId.value = storedId
-          localStorage.setItem('activeConversationId', storedId)
+        const res = await fetch(`${BASE_URL}/conversations`, {
+          method: 'POST'
+        })
+        if (res.ok) {
+          const data = await res.json()
+          storedId = data.conversationId
+          if (storedId) {
+            activeConversationId.value = storedId
+            localStorage.setItem('activeConversationId', storedId)
+          }
         }
       } catch (e) {
         console.error('Failed to create new conversation:', e)
@@ -298,13 +308,18 @@ export const useStomp = () => {
 
   const createNewConversation = async () => {
     try {
-      const data = await conversationsApi.create()
-      const newId = data.conversationId
-      if (newId) {
-        activeConversationId.value = newId
-        localStorage.setItem('activeConversationId', newId)
-        messages.value = []
-        await loadConversations()
+      const res = await fetch(`${BASE_URL}/conversations`, {
+        method: 'POST'
+      })
+      if (res.ok) {
+        const data = await res.json()
+        const newId = data.conversationId
+        if (newId) {
+          activeConversationId.value = newId
+          localStorage.setItem('activeConversationId', newId)
+          messages.value = []
+          await loadConversations()
+        }
       }
     } catch (e) {
       console.error('Failed to create new conversation:', e)
@@ -327,12 +342,17 @@ export const useStomp = () => {
     if (!activeConversationId.value) {
       console.warn('activeConversationId is null in sendMessage, attempting to create one now...')
       try {
-        const data = await conversationsApi.create()
-        const newId = data.conversationId
-        if (newId) {
-          activeConversationId.value = newId
-          localStorage.setItem('activeConversationId', newId)
-          await loadConversations()
+        const res = await fetch(`${BASE_URL}/conversations`, {
+          method: 'POST'
+        })
+        if (res.ok) {
+          const data = await res.json()
+          const newId = data.conversationId
+          if (newId) {
+            activeConversationId.value = newId
+            localStorage.setItem('activeConversationId', newId)
+            await loadConversations()
+          }
         }
       } catch (e) {
         console.error('Failed to auto-create conversation in sendMessage:', e)
