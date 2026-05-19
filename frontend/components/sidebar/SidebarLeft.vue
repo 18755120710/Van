@@ -29,8 +29,7 @@
 
     <!-- Sidebar Navigation Options -->
     <nav class="sidebar-nav">
-      <!-- 视图切换选项 -->
-      <div class="nav-section-title">功能菜单</div>
+      <!-- AI 智能对话 Tab -->
       <button 
         class="nav-item" 
         :class="{ 'active': currentView === 'chat' }"
@@ -41,17 +40,6 @@
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
         <span>AI 智能对话</span>
-      </button>
-      <button 
-        class="nav-item" 
-        :class="{ 'active': currentView === 'prompt' }"
-        @click="setView('prompt')"
-        type="button"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-        </svg>
-        <span>Agent 配置 / Prompt 管理</span>
       </button>
 
       <!-- 对话模式特有部分 -->
@@ -85,6 +73,23 @@
         </div>
       </template>
     </nav>
+
+    <!-- 系统设置按钮入口 -->
+    <div class="sidebar-settings-section">
+      <button 
+        class="nav-item" 
+        :class="{ 'active': currentView === 'settings' }"
+        @click="setView('settings')"
+        type="button"
+        title="系统设置"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>系统设置</span>
+      </button>
+    </div>
 
     <!-- Sidebar User Section -->
     <div class="sidebar-footer">
@@ -165,3 +170,11 @@ const formatRelativeTime = (timestamp: number) => {
   }
 }
 </script>
+
+<style scoped>
+.sidebar-settings-section {
+  padding: 0.5rem;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+}
+</style>
