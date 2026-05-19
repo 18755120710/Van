@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="feat: 优化前端项目">
-      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/model/AgentModelConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/model/AgentModelConfigView.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/model/UpdateModelConfigRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/AgentModelProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/ModelConfigService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/configcenter/service/impl/ModelConfigServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -104,20 +105,13 @@
         <option value="js.build_tools.npm" />
       </set>
     </option>
-    <option name="configurationStatuses">
+    <option name="hiddenConfigurations">
       <map>
         <entry key="SpringBootApplicationConfigurationType">
           <value>
-            <map>
-              <entry key="AgentApplication" value="STOPPED" />
-            </map>
-          </value>
-        </entry>
-        <entry key="js.build_tools.npm">
-          <value>
-            <map>
-              <entry key="nuxt-client" value="STOPPED" />
-            </map>
+            <set>
+              <option value="AgentApplication" />
+            </set>
           </value>
         </entry>
       </map>

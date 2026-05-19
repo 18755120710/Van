@@ -19,6 +19,7 @@ prompt:
   locale: /prompt
 agent-config:
   prompt-dir: ./data/agent-config/prompts
+  model-file: ./data/agent-config/model-config.json
 
 file:
   base: /temp/my-manus-agentscope
