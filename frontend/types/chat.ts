@@ -36,3 +36,25 @@ export interface DialogMessageDTO {
     serverStatusHint?: number;
   };
 }
+
+export interface ConversationMeta {
+  conversationId: string;
+  title: string;
+  titleGenerated: boolean;
+  createAt: number;
+  updateAt: number;
+  messageCount: number;
+  deleted: boolean;
+}
+
+export interface UiMessage {
+  id: string;
+  conversationId: string;
+  type: 'user' | 'server';
+  traceId?: string;
+  text?: string;
+  imageUrl?: string;
+  fileUrl?: string;
+  openUrl?: string;
+  createAt: number;
+}
