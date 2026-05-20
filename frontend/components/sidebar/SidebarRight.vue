@@ -294,7 +294,7 @@ const filteredToolResults = computed(() => {
       if (activeFilter.value === 'plan') return item.eventType === 'plan'
       if (activeFilter.value === 'error') return item.eventType === 'error'
       if (activeFilter.value === 'tool') {
-        return item.eventType === 'tool_call' || item.eventType === 'tool_result'
+        return item.eventType === 'tool_call' || item.eventType === 'tool_result' || item.eventType === 'token_usage'
       }
       return true
     })
@@ -389,6 +389,12 @@ const sandboxState = computed(() => {
     speechText = '任务完美执行！这是向造物主提交的最终报告。'
     storyText = `🏆 任务圆满通关！PlannerAgent 离开自己座位，走近 Developer 工作台，将最终策略报告双手呈递给人类。`
   }
+  // 8. Token Usage Statistics
+  else if (type === 'token_usage') {
+    activeSpeaker = 'system'
+    speechText = text || '本轮大模型 Token 消耗情况已上报。'
+    storyText = `📊 协同大厅能耗监测：本轮对话模型 Token 消耗详情已送达，请在调试日志中查看。`
+  }
 
   return {
     activeSpeaker,
@@ -445,6 +451,7 @@ const getEventTypeName = (eventType: string) => {
     case 'summary': return '执行摘要'
     case 'answer': return '最终回答'
     case 'stopped': return '执行停止'
+    case 'token_usage': return 'Token 消耗'
     default: return eventType || '执行步骤'
   }
 }
@@ -913,6 +920,10 @@ const sync3DTargetsWithState = () => {
     // Planner stands up and walks to developer desk to hand in final reports
     plannerTarget.copy(devDeskPos)
     devTarget.copy(devChairPos)
+    browserTarget.copy(browserChairPos)
+  } else if (type === 'token_usage') {
+    devTarget.copy(devChairPos)
+    plannerTarget.copy(plannerChairPos)
     browserTarget.copy(browserChairPos)
   }
 }
