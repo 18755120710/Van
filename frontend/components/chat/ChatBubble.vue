@@ -37,7 +37,7 @@
         ></div>
 
         <!-- 精致的侧边栏日志唤起按钮 -->
-        <div v-if="message.toolResults && message.toolResults.length > 0" class="view-trace-action">
+        <div v-if="hasOtherToolResults" class="view-trace-action">
           <button 
             class="btn-view-trace" 
             :class="{ 'active': activeTraceMsgId === message.traceId && isRightPanelOpen }" 
@@ -50,9 +50,41 @@
             </svg>
             <span>
               {{ activeTraceMsgId === message.traceId && isRightPanelOpen ? '正在查看执行步骤' : '查看执行步骤' }} 
-              ({{ message.toolResults.length }})
+              ({{ otherToolResultsCount }})
             </span>
           </button>
+        </div>
+
+        <!-- Token 消耗面板展示 -->
+        <div v-if="parsedTokenStats" class="token-stats-bar">
+          <div class="token-stats-header">
+            <svg class="token-icon-mini" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+            </svg>
+            <span>大模型能耗统计</span>
+          </div>
+          <div v-if="parsedTokenStats.input || parsedTokenStats.output || parsedTokenStats.total" class="token-stats-grid">
+            <div class="stat-pill" v-if="parsedTokenStats.input">
+              <span class="stat-label">输入 Token</span>
+              <span class="stat-val">{{ parsedTokenStats.input }}</span>
+            </div>
+            <div class="stat-pill" v-if="parsedTokenStats.output">
+              <span class="stat-label">输出 Token</span>
+              <span class="stat-val">{{ parsedTokenStats.output }}</span>
+            </div>
+            <div class="stat-pill total" v-if="parsedTokenStats.total">
+              <span class="stat-label">总消耗</span>
+              <span class="stat-val">{{ parsedTokenStats.total }}</span>
+            </div>
+            <div class="stat-pill" v-if="parsedTokenStats.duration">
+              <span class="stat-label">耗时</span>
+              <span class="stat-val">{{ parsedTokenStats.duration }}s</span>
+            </div>
+          </div>
+          <div v-else class="token-stats-fallback">
+            <pre class="token-raw-pre">{{ parsedTokenStats.rawText }}</pre>
+          </div>
         </div>
         
         <!-- 丰富的媒体图片展示 (如有) -->
@@ -114,6 +146,42 @@ const timeStr = ref('')
 onMounted(() => {
   const now = new Date()
   timeStr.value = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+})
+
+// Token usage parsing and display logic
+const tokenUsage = computed(() => {
+  if (!props.message.toolResults) return null
+  return props.message.toolResults.find(r => r.eventType === 'token_usage') || null
+})
+
+const parsedTokenStats = computed(() => {
+  const usage = tokenUsage.value
+  if (!usage || !usage.text) return null
+  
+  const inputMatch = usage.text.match(/输入\s*Token[：:]\s*(\d+)/i)
+  const outputMatch = usage.text.match(/输出\s*Token[：:]\s*(\d+)/i)
+  const totalMatch = usage.text.match(/总\s*Token[：:]\s*(\d+)/i)
+  const countMatch = usage.text.match(/模型调用次数[：:]\s*(\d+)/i)
+  const durationMatch = usage.text.match(/模型总耗时[：:]\s*([\d.]+)\s*秒?/i)
+  
+  return {
+    input: inputMatch ? inputMatch[1] : null,
+    output: outputMatch ? outputMatch[1] : null,
+    total: totalMatch ? totalMatch[1] : null,
+    count: countMatch ? countMatch[1] : null,
+    duration: durationMatch ? durationMatch[1] : null,
+    rawText: usage.text
+  }
+})
+
+const hasOtherToolResults = computed(() => {
+  if (!props.message.toolResults || props.message.toolResults.length === 0) return false
+  return props.message.toolResults.some(r => r.eventType !== 'token_usage')
+})
+
+const otherToolResultsCount = computed(() => {
+  if (!props.message.toolResults) return 0
+  return props.message.toolResults.filter(r => r.eventType !== 'token_usage').length
 })
 
 // Compiled dynamic Markdown rendering

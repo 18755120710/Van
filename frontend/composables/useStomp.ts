@@ -127,8 +127,10 @@ export const useStomp = () => {
         })
         activeTraceMsgId.value = dto.traceId
 
-        // 关键特性：复杂轨迹事件自动拉开右侧思考面板
-        isRightPanelOpen.value = true
+        // 关键特性：复杂轨迹事件自动拉开右侧思考面板 (排除 token_usage 简单事件)
+        if (dto.eventType !== 'token_usage') {
+          isRightPanelOpen.value = true
+        }
 
         if (dto.done === true) {
           msg.streaming = false
