@@ -2043,3 +2043,457 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 0.15rem;
 }
 
+/* ==========================================
+   AI RPG MEETING SANDBOX SYSTEM STYLE OVERRIDES
+   ========================================== */
+
+.panel-view-switcher {
+  display: flex;
+  padding: 0.65rem 1.25rem 0.35rem 1.25rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-light);
+  gap: 0.45rem;
+}
+
+.view-switch-btn {
+  flex: 1;
+  border: 1px solid var(--border-light);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.45rem 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.view-switch-btn:hover {
+  background: var(--bg-active);
+  color: var(--text-primary);
+}
+
+.view-switch-btn.active {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Sandbox Playground Board */
+.sandbox-board {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 0%, #15151a 0%, #050508 100%);
+  padding: 1.25rem 1rem;
+  gap: 1.25rem;
+  justify-content: space-between;
+}
+
+.cyber-meeting-room {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+/* Hologram circular board table */
+.cyber-table-container {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cyber-table {
+  width: 160px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(37, 99, 235, 0.18) 0%, rgba(37, 99, 235, 0.02) 80%);
+  border: 1.5px solid rgba(37, 99, 235, 0.25);
+  position: absolute;
+  transform: translateY(24px);
+  box-shadow: 0 0 28px rgba(37, 99, 235, 0.15), inset 0 0 16px rgba(37, 99, 235, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: tableGlow 4s infinite alternate ease-in-out;
+}
+
+@keyframes tableGlow {
+  0% {
+    box-shadow: 0 0 16px rgba(37, 99, 235, 0.1), inset 0 0 12px rgba(37, 99, 235, 0.05);
+    border-color: rgba(37, 99, 235, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 36px rgba(37, 99, 235, 0.3), inset 0 0 24px rgba(37, 99, 235, 0.2);
+    border-color: rgba(37, 99, 235, 0.45);
+  }
+}
+
+.cyber-table-radar {
+  position: absolute;
+  width: 130px;
+  height: 65px;
+  border-radius: 50%;
+  border: 1px dashed rgba(37, 99, 235, 0.25);
+  animation: radarScan 3s infinite linear;
+}
+
+@keyframes radarScan {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Character slots around the table */
+.sandbox-character-node {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+.sandbox-character-node.node-developer {
+  top: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.sandbox-character-node.node-planner {
+  bottom: 12%;
+  left: 6%;
+}
+
+.sandbox-character-node.node-browser {
+  bottom: 12%;
+  right: 6%;
+}
+
+/* 3D Holographic style character card */
+.character-card {
+  width: 96px;
+  height: 116px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  gap: 0.4rem;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  animation: cardFloat 3.2s infinite ease-in-out;
+}
+
+.node-planner .character-card { animation-delay: 0.6s; }
+.node-browser .character-card { animation-delay: 1.2s; }
+
+.character-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes cardFloat {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0); }
+}
+
+.character-avatar-wrapper {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.character-avatar-wrapper svg {
+  width: 32px;
+  height: 32px;
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.3s ease;
+}
+
+.character-name {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.character-status-hint {
+  font-size: 0.58rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 500;
+}
+
+/* Card Glowing State Rings */
+.character-pedestal {
+  width: 58px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.04);
+  transition: all 0.3s ease;
+}
+
+/* 1. Developer Speaking state */
+.character-card.dev-speaking {
+  border-color: rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.15);
+}
+.character-card.dev-speaking .character-avatar-wrapper {
+  border-color: #a855f7;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+}
+.character-card.dev-speaking .character-avatar-wrapper svg {
+  color: #c084fc;
+}
+.character-card.dev-speaking .character-pedestal {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
+}
+
+/* 2. Planner states */
+.character-card.planner-speaking {
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.15);
+}
+.character-card.planner-speaking .character-avatar-wrapper {
+  border-color: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+.character-card.planner-speaking .character-avatar-wrapper svg {
+  color: #60a5fa;
+}
+.character-card.planner-speaking .character-pedestal {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.4);
+}
+
+/* 3. Browser states */
+.character-card.browser-speaking {
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.15);
+}
+.character-card.browser-speaking .character-avatar-wrapper {
+  border-color: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+.character-card.browser-speaking .character-avatar-wrapper svg {
+  color: #34d399;
+}
+.character-card.browser-speaking .character-pedestal {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+}
+
+.character-card.browser-working {
+  border-color: rgba(245, 158, 11, 0.35);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.15);
+}
+.character-card.browser-working .character-avatar-wrapper {
+  border-color: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+}
+.character-card.browser-working .character-avatar-wrapper svg {
+  color: #fbbf24;
+}
+.character-card.browser-working .character-pedestal {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+}
+
+/* Spinning Working Rings overlay on character avatar */
+.character-avatar-wrapper.spinning-work::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  top: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  border: 1.5px dashed #f59e0b;
+  animation: spinnerRotate 4s infinite linear;
+}
+
+@keyframes spinnerRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Floating speech bubble above card */
+.sandbox-bubble {
+  position: absolute;
+  bottom: 130px;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.65rem;
+  font-size: 0.72rem;
+  color: #e4e4e7;
+  width: 175px;
+  max-height: 80px;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  pointer-events: auto;
+  animation: bubbleBounce 0.28s cubic-bezier(0.2, 0.8, 0.2, 1.2) forwards;
+}
+
+.sandbox-bubble::-webkit-scrollbar {
+  width: 2px;
+}
+.sandbox-bubble::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.sandbox-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 10px;
+  height: 10px;
+  background: rgba(15, 23, 42, 0.94);
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+@keyframes bubbleBounce {
+  0% { transform: scale(0.65) translateY(12px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Retro RPG Narrative Dialogue Box */
+.rpg-dialogue-console {
+  background: rgba(9, 9, 11, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.75rem;
+  color: #34d399;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), inset 0 0 10px rgba(52, 211, 153, 0.04);
+  min-height: 72px;
+  max-height: 90px;
+  overflow-y: auto;
+  position: relative;
+  line-height: 1.5;
+}
+
+.rpg-dialogue-console::-webkit-scrollbar {
+  width: 3px;
+}
+.rpg-dialogue-console::-webkit-scrollbar-thumb {
+  background: rgba(52, 211, 153, 0.2);
+}
+
+.rpg-dialogue-cursor {
+  animation: cursorBlink 0.8s infinite steps(2);
+  color: #34d399;
+  font-weight: 800;
+  margin-left: 1px;
+}
+
+@keyframes cursorBlink {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Flying Data Packages */
+.glowing-packet {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #3b82f6;
+  box-shadow: 0 0 10px #3b82f6, 0 0 22px #3b82f6;
+  z-index: 150;
+  pointer-events: none;
+}
+
+.glowing-packet.dev-to-planner {
+  animation: pathDevToPlanner 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.glowing-packet.planner-to-browser {
+  animation: pathPlannerToBrowser 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.glowing-packet.browser-to-planner {
+  animation: pathBrowserToPlanner 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981, 0 0 22px #10b981;
+}
+
+.glowing-packet.planner-to-dev {
+  animation: pathPlannerToDev 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes pathDevToPlanner {
+  0% { left: 50%; top: 12%; opacity: 0; transform: scale(0.5); }
+  15% { opacity: 1; transform: scale(1.3); }
+  85% { opacity: 1; transform: scale(1.3); }
+  100% { left: 16%; top: 68%; opacity: 0; transform: scale(0.5); }
+}
+
+@keyframes pathPlannerToBrowser {
+  0% { left: 16%; top: 68%; opacity: 0; transform: scale(0.5); }
+  15% { opacity: 1; transform: scale(1.3); }
+  85% { opacity: 1; transform: scale(1.3); }
+  100% { left: 84%; top: 68%; opacity: 0; transform: scale(0.5); }
+}
+
+@keyframes pathBrowserToPlanner {
+  0% { left: 84%; top: 68%; opacity: 0; transform: scale(0.5); }
+  15% { opacity: 1; transform: scale(1.3); }
+  85% { opacity: 1; transform: scale(1.3); }
+  100% { left: 16%; top: 68%; opacity: 0; transform: scale(0.5); }
+}
+
+@keyframes pathPlannerToDev {
+  0% { left: 16%; top: 68%; opacity: 0; transform: scale(0.5); }
+  15% { opacity: 1; transform: scale(1.3); }
+  85% { opacity: 1; transform: scale(1.3); }
+  100% { left: 50%; top: 12%; opacity: 0; transform: scale(0.5); }
+}
+
