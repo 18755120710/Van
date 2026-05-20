@@ -27,7 +27,7 @@
         @click="activeTab = 'sandbox'"
         type="button"
       >
-        🎮 创想沙盒
+        🎮 3D 创想沙盒
       </button>
       <button 
         class="view-switch-btn" 
@@ -180,107 +180,44 @@
       </div>
     </template>
 
-    <!-- VIEW 2: AI RPG Game Sandbox Round Table -->
+    <!-- VIEW 2: Three.js 3D Office Sandbox -->
     <template v-else-if="activeTab === 'sandbox'">
       <div class="sandbox-board" v-if="activeTraceMsg">
-        <!-- Interactive 3D/2.5D Conference Room Container -->
-        <div class="cyber-meeting-room">
-          
-          <!-- Glowing holographic cyber board table -->
-          <div class="cyber-table-container">
-            <div class="cyber-table">
-              <div class="cyber-table-radar"></div>
-            </div>
-          </div>
+        
+        <!-- Three.js 3D Viewport container -->
+        <div ref="canvasContainer" class="three-canvas-container">
+          <!-- Control Hint label -->
+          <div class="three-hud-controls">🖱️ 拖拽以旋转视角</div>
 
-          <!-- Flying Glowing Data Bullet Package -->
-          <div 
-            v-if="flyingPacket" 
-            class="glowing-packet" 
-            :class="flyingPacket.type"
-          ></div>
-
-          <!-- NODE 1: Human / Developer (North) -->
-          <div class="sandbox-character-node node-developer">
-            <!-- Speaking Dialogue bubble box -->
-            <div class="sandbox-bubble" v-if="sandboxState.activeSpeaker === 'developer'">
+          <!-- Dynamic Speech bubble overlays projected from 3D coordinates -->
+          <div class="three-bubble-container">
+            <!-- Developer bubble -->
+            <div 
+              class="three-bubble" 
+              v-if="sandboxState.activeSpeaker === 'developer' && devBubblePos.x > 0"
+              :style="{ left: `${devBubblePos.x}px`, top: `${devBubblePos.y}px` }"
+            >
               {{ sandboxState.text }}
             </div>
-            <!-- Chibi Character Card -->
-            <div 
-              class="character-card" 
-              :class="{ 'dev-speaking': sandboxState.devState === 'speaking' }"
-              title="人类主宰开发者"
-            >
-              <div class="character-avatar-wrapper">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <span class="character-name">Developer</span>
-              <span class="character-status-hint">
-                {{ sandboxState.activeSpeaker === 'developer' ? '📢 发派指令' : '人类造物主' }}
-              </span>
-              <div class="character-pedestal"></div>
-            </div>
-          </div>
 
-          <!-- NODE 2: Planner Agent (South-West) -->
-          <div class="sandbox-character-node node-planner">
-            <!-- Speaking Dialogue bubble box -->
-            <div class="sandbox-bubble" v-if="sandboxState.activeSpeaker === 'planner'">
+            <!-- Planner bubble -->
+            <div 
+              class="three-bubble" 
+              v-if="sandboxState.activeSpeaker === 'planner' && plannerBubblePos.x > 0"
+              :style="{ left: `${plannerBubblePos.x}px`, top: `${plannerBubblePos.y}px` }"
+            >
               {{ sandboxState.text }}
             </div>
-            <!-- Chibi Character Card -->
-            <div 
-              class="character-card" 
-              :class="{ 'planner-speaking': sandboxState.plannerState === 'speaking' }"
-              title="决策领航者 (PlannerAgent)"
-            >
-              <div class="character-avatar-wrapper">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                </svg>
-              </div>
-              <span class="character-name">Planner</span>
-              <span class="character-status-hint">
-                {{ sandboxState.activeSpeaker === 'planner' ? '💡 思考决策' : '策略决策中心' }}
-              </span>
-              <div class="character-pedestal"></div>
-            </div>
-          </div>
 
-          <!-- NODE 3: Browser Agent (South-East) -->
-          <div class="sandbox-character-node node-browser">
-            <!-- Speaking Dialogue bubble box -->
-            <div class="sandbox-bubble" v-if="sandboxState.activeSpeaker === 'browser'">
+            <!-- Browser bubble -->
+            <div 
+              class="three-bubble" 
+              v-if="sandboxState.activeSpeaker === 'browser' && browserBubblePos.x > 0"
+              :style="{ left: `${browserBubblePos.x}px`, top: `${browserBubblePos.y}px` }"
+            >
               {{ sandboxState.text }}
             </div>
-            <!-- Chibi Character Card -->
-            <div 
-              class="character-card" 
-              :class="{ 
-                'browser-speaking': sandboxState.browserState === 'speaking', 
-                'browser-working': sandboxState.browserState === 'working' 
-              }"
-              title="无畏探索者 (BrowserAgent)"
-            >
-              <div 
-                class="character-avatar-wrapper"
-                :class="{ 'spinning-work': sandboxState.browserState === 'working' }"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                </svg>
-              </div>
-              <span class="character-name">Browser</span>
-              <span class="character-status-hint">
-                {{ sandboxState.browserState === 'working' ? '⚙️ 操作浏览器' : (sandboxState.activeSpeaker === 'browser' ? '📢 状态上报' : '无畏执行官') }}
-              </span>
-              <div class="character-pedestal"></div>
-            </div>
           </div>
-
         </div>
 
         <!-- Narrative Retro RPG dialogue bottom screen -->
@@ -295,18 +232,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useStomp } from '~/composables/useStomp'
+import * as THREE from 'three'
 
 const rightPanelContent = ref<HTMLElement | null>(null)
+const canvasContainer = ref<HTMLElement | null>(null)
 const copiedIndex = ref<number | null>(null)
 const activeFilter = ref<'all' | 'plan' | 'tool' | 'error'>('all')
 
-// Tabs: timeline (debug logs list), sandbox (RPG conference board game)
+// Tab status: sandbox (3D RPG Office), timeline (console logging)
 const activeTab = ref<'sandbox' | 'timeline'>('sandbox')
 
-// Flying energy particle flows DTO
-const flyingPacket = ref<{ type: string } | null>(null)
+// Speech bubble coordinate projectors
+const devBubblePos = ref({ x: 0, y: 0 })
+const plannerBubblePos = ref({ x: 0, y: 0 })
+const browserBubblePos = ref({ x: 0, y: 0 })
 
 // Expanded cards registry
 const expandedItems = ref<Record<number, boolean>>({})
@@ -366,7 +307,7 @@ const sandboxState = computed(() => {
     return {
       activeSpeaker: 'developer',
       text: '正在等待开发者下达探索任务...',
-      storyText: '等待人类主宰下达初始指令，开启全新的 Agent 创想与行动协作大厅。',
+      storyText: '低功耗待机中。等待人类主宰下达初始指令，开启 3D 智能协同大厅工作舱。',
       plannerState: 'idle',
       browserState: 'idle',
       devState: 'speaking'
@@ -391,7 +332,7 @@ const sandboxState = computed(() => {
     return {
       activeSpeaker: 'system',
       text: '指令中断。已成功强制停止当前的协同执行。',
-      storyText: '⚠️ 系统警报：人类主宰发出了 [STOP] 强制阻断指令。所有 Agent 现已立即中断执行并回归待机。',
+      storyText: '⚠️ 系统警报：人类造物主发出了 [STOP] 强制阻断指令。所有 Agent 现已安全回归各自工位待命。',
       plannerState: 'idle',
       browserState: 'idle',
       devState: 'idle'
@@ -403,7 +344,7 @@ const sandboxState = computed(() => {
     activeSpeaker = 'planner'
     plannerState = 'speaking'
     speechText = text || '正在分析开发者指令，开始规划多步拆解动作...'
-    storyText = `💡 决策领航者 PlannerAgent 闭目沉思，正在对全局任务进行矩阵拆解，制定执行计划。`
+    storyText = `💡 决策领航者 PlannerAgent 回归工位，开始思考全局任务并制定执行规划方案。`
   } 
   // 2. Planner Calls Browser
   else if (type === 'agent_call') {
@@ -411,34 +352,34 @@ const sandboxState = computed(() => {
     plannerState = 'speaking'
     browserState = 'working'
     speechText = text || `向 BrowserAgent 发起战术连线，传输子动作指令包！`
-    storyText = `📡 PlannerAgent 完成决策调度，向 BrowserAgent 发送高优先级执行数据包包，请 BrowserAgent 立即着手动作。`
+    storyText = `📡 PlannerAgent 站起身，真实地步行前往 BrowserAgent 的工位，向其面交并详细分派子探索指令。`
   } 
   // 3. Browser Executes Tool
   else if (type === 'tool_call') {
     activeSpeaker = 'browser'
     browserState = 'working'
     speechText = `指令接收完毕！正启用工具 [${toolName}] 进行物理侧操作...`
-    storyText = `⚙️ 收到Planner调度指令！BrowserAgent 激活探索者护目镜，正熟练操作底层网络硬件工具: [${toolName}]...`
+    storyText = `⚙️ 收到Planner面交指令！BrowserAgent 坐回电脑前，屏幕发出橙光，正敲击键盘调用网页工具: [${toolName}]...`
   } 
   // 4. Browser Reports Result
   else if (type === 'tool_result') {
     activeSpeaker = 'browser'
     browserState = 'speaking'
     speechText = text ? `工具操作成功！结果上报：${text.substring(0, 75)}...` : `工具操作成功，回执结果已准备好汇报！`
-    storyText = `✅ BrowserAgent 顺利采集到网页反馈，已将高精工具 [${toolName}] 的物理侧输出结果封包汇报给 PlannerAgent。`
+    storyText = `✅ BrowserAgent 顺利采集完毕。它离开工位，走过办公室，来到 PlannerAgent 桌旁详细上报工具数据结果。`
   } 
   // 5. System Interception / Error
   else if (type === 'error') {
     activeSpeaker = 'system'
     speechText = `执行错误：${text}`
-    storyText = `💥 警告：协同链路在执行工具 [${toolName || '未知'}] 时发生系统异常！详情：${text}`
+    storyText = `💥 警告：协同大厅发生设备故障！调用物理侧 [${toolName || '未知'}] 时发生系统异常！详情：${text}`
   } 
   // 6. Summary compilation
   else if (type === 'summary') {
     activeSpeaker = 'planner'
     plannerState = 'speaking'
     speechText = text || '正在分析整理各步骤的输出反馈，产出最终决策摘要...'
-    storyText = `📝 PlannerAgent 梳理各方线索，开始融合最终的数据逻辑并编写任务总结汇报。`
+    storyText = `📝 PlannerAgent 整理探索回执，开始在其主控工作电脑前融汇数据逻辑并撰写执行摘要报告。`
   } 
   // 7. Final Response (Deliver answer)
   else if (type === 'answer') {
@@ -446,7 +387,7 @@ const sandboxState = computed(() => {
     plannerState = 'speaking'
     devState = 'speaking'
     speechText = '任务完美执行！这是向造物主提交的最终报告。'
-    storyText = `🏆 任务圆满通关！PlannerAgent 将最终策略报告双手呈递给人类造物主，等待全新指令。`
+    storyText = `🏆 任务圆满通关！PlannerAgent 离开自己座位，走近 Developer 工作台，将最终策略报告双手呈递给人类。`
   }
 
   return {
@@ -508,44 +449,542 @@ const getEventTypeName = (eventType: string) => {
   }
 }
 
-// Watch toolResults length to auto-scroll logs list & auto-expand new steps
+// ==========================================
+// THREE.JS 3D ENGINE CORE LOGIC (CLIENT SIDE)
+// ==========================================
+
+let scene: THREE.Scene | null = null
+let camera: THREE.PerspectiveCamera | null = null
+let renderer: THREE.WebGLRenderer | null = null
+let animFrameId: number | null = null
+
+// Mesh refs
+let devMesh: THREE.Group | null = null
+let plannerMesh: THREE.Group | null = null
+let browserMesh: THREE.Group | null = null
+
+// Glowing computer screen materials (to update brightness when active)
+let devScreenMat: THREE.MeshEmissiveMaterial | any = null
+let plannerScreenMat: THREE.MeshEmissiveMaterial | any = null
+let browserScreenMat: THREE.MeshEmissiveMaterial | any = null
+
+// 3D Target vectors
+const devTarget = new THREE.Vector3()
+const plannerTarget = new THREE.Vector3()
+const browserTarget = new THREE.Vector3()
+
+// Preset Static Positions
+const CHAIR_HEIGHT = 0.38
+const STAND_HEIGHT = 0.38
+
+// Workstations (Chairs)
+const devChairPos = new THREE.Vector3(0, CHAIR_HEIGHT, -2.6)
+const plannerChairPos = new THREE.Vector3(-2.2, CHAIR_HEIGHT, 1.2)
+const browserChairPos = new THREE.Vector3(2.2, CHAIR_HEIGHT, 1.2)
+
+// Standing Walk destinations
+const devDeskPos = new THREE.Vector3(0, STAND_HEIGHT, -1.5) // Planner stands next to developer desk
+const browserDeskPos = new THREE.Vector3(1.2, STAND_HEIGHT, 1.2) // Planner stands next to browser desk
+const plannerDeskPos = new THREE.Vector3(-1.2, STAND_HEIGHT, 1.2) // Browser stands next to planner desk
+
+// Camera Orbit Dragging variables
+let theta = 45 * Math.PI / 180
+let phi = 30 * Math.PI / 180
+const radius = 8.5
+let isDraggingCamera = false
+let previousMousePosition = { x: 0, y: 0 }
+
+const initThreeScene = () => {
+  if (!canvasContainer.value || !process.client) return
+
+  const width = canvasContainer.value.clientWidth
+  const height = canvasContainer.value.clientHeight
+
+  // 1. Create Scene
+  scene = new THREE.Scene()
+  scene.background = null // Transparent/CSS gradient fallback
+
+  // 2. Create Camera
+  camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100)
+  updateCameraPosition()
+
+  // 3. Create WebGL Renderer
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+  renderer.setSize(width, height)
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  canvasContainer.value.appendChild(renderer.domElement)
+
+  // 4. Lights
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
+  scene.add(ambientLight)
+
+  const sunLight = new THREE.DirectionalLight(0xffffff, 0.8)
+  sunLight.position.set(5, 10, 3)
+  scene.add(sunLight)
+
+  // Soft purple glowing neon light in center of office floor
+  const pointLight = new THREE.PointLight(0x6366f1, 1.2, 10)
+  pointLight.position.set(0, 1.5, 0)
+  scene.add(pointLight)
+
+  // 5. Digital Grid Floor (Holographic office island)
+  const floorGeo = new THREE.BoxGeometry(6.6, 0.15, 6.6)
+  const floorMat = new THREE.MeshStandardMaterial({
+    color: 0x111118,
+    roughness: 0.8,
+    metalness: 0.2
+  })
+  const floor = new THREE.Mesh(floorGeo, floorMat)
+  floor.position.y = -0.075
+  scene.add(floor)
+
+  const gridHelper = new THREE.GridHelper(6.6, 12, 0x3b82f6, 0x27272a)
+  gridHelper.position.y = 0.01
+  scene.add(gridHelper)
+
+  // 6. Build Desks, Chairs, and Computers
+  // A. Developer desk
+  buildDesk(0, 0, -2.0, 0x1f1f2e, 0xa855f7)
+  // B. Planner desk
+  buildDesk(-2.2, 0, 0.5, 0x1c2135, 0x3b82f6)
+  // C. Browser desk
+  buildDesk(2.2, 0, 0.5, 0x221c15, 0xf59e0b)
+
+  // Decorative Chibi plants
+  buildCutePlant(-3.0, 0, -3.0)
+  buildCutePlant(3.0, 0, -3.0)
+
+  // 7. Initialize Character meshes
+  devMesh = buildChibiCharacter(0xa855f7, 0xd8b4fe) // Developer (Purple)
+  plannerMesh = buildChibiCharacter(0x3b82f6, 0x93c5fd) // Planner (Blue)
+  browserMesh = buildChibiCharacter(0xf59e0b, 0xfde047) // Browser (Orange)
+
+  scene.add(devMesh)
+  scene.add(plannerMesh)
+  scene.add(browserMesh)
+
+  // Snap characters initially sitting at their desks
+  devMesh.position.copy(devChairPos)
+  plannerMesh.position.copy(plannerChairPos)
+  browserMesh.position.copy(browserChairPos)
+
+  devTarget.copy(devChairPos)
+  plannerTarget.copy(plannerChairPos)
+  browserTarget.copy(browserChairPos)
+
+  // 8. Attach Mouse Orbit Controls Event Listeners
+  const canvas = renderer.domElement
+  canvas.addEventListener('mousedown', onMouseDown)
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+
+  // Handle Resize
+  window.addEventListener('resize', handleResize)
+
+  // Run render loop
+  animate()
+}
+
+// Procedural mahogany desk builder with computers
+const buildDesk = (x: number, y: number, z: number, woodColor: number, neonColor: number) => {
+  if (!scene) return
+
+  // Desk top wood
+  const deskGeo = new THREE.BoxGeometry(1.4, 0.08, 0.8)
+  const deskMat = new THREE.MeshStandardMaterial({ color: woodColor, roughness: 0.6 })
+  const desk = new THREE.Mesh(deskGeo, deskMat)
+  desk.position.set(x, 0.6, z)
+  scene.add(desk)
+
+  // Legs (two boxes at sides)
+  const legMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.7 })
+  const leg1 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.6, 0.7), legMat)
+  leg1.position.set(x - 0.6, 0.3, z)
+  scene.add(leg1)
+
+  const leg2 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.6, 0.7), legMat)
+  leg2.position.set(x + 0.6, 0.3, z)
+  scene.add(leg2)
+
+  // Laptop body
+  const laptopGeo = new THREE.BoxGeometry(0.35, 0.02, 0.25)
+  const laptop = new THREE.Mesh(laptopGeo, legMat)
+  laptop.position.set(x, 0.65, z)
+  scene.add(laptop)
+
+  // Laptop glowing screen (Emissive)
+  const screenGeo = new THREE.BoxGeometry(0.35, 0.22, 0.02)
+  const screenMat = new THREE.MeshStandardMaterial({
+    color: 0x09090b,
+    emissive: neonColor,
+    emissiveIntensity: 0.8,
+    roughness: 0.1
+  })
+  const screen = new THREE.Mesh(screenGeo, screenMat)
+  screen.position.set(x, 0.77, z - 0.1)
+  screen.rotation.x = -10 * Math.PI / 180 // slight tilt back
+  scene.add(screen)
+
+  // Save computer screen references to fluctuate intensities
+  if (neonColor === 0xa855f7) devScreenMat = screenMat
+  if (neonColor === 0x3b82f6) plannerScreenMat = screenMat
+  if (neonColor === 0xf59e0b) browserScreenMat = screenMat
+
+  // Small office chair
+  const seatGeo = new THREE.BoxGeometry(0.44, 0.08, 0.44)
+  const seat = new THREE.Mesh(seatGeo, legMat)
+  seat.position.set(x, 0.34, z + 0.6)
+  scene.add(seat)
+
+  const backGeo = new THREE.BoxGeometry(0.44, 0.35, 0.06)
+  const back = new THREE.Mesh(backGeo, legMat)
+  back.position.set(x, 0.52, z + 0.8)
+  scene.add(back)
+}
+
+// Cute procedurally generated 3D plant pot
+const buildCutePlant = (x: number, y: number, z: number) => {
+  if (!scene) return
+  // Brown pot
+  const potGeo = new THREE.CylinderGeometry(0.2, 0.15, 0.35, 8)
+  const potMat = new THREE.MeshStandardMaterial({ color: 0x78350f })
+  const pot = new THREE.Mesh(potGeo, potMat)
+  pot.position.set(x, 0.175, z)
+  scene.add(pot)
+
+  // Green spherical leaves
+  const leafMat = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.9 })
+  const leaf1 = new THREE.Mesh(new THREE.SphereGeometry(0.24, 8, 8), leafMat)
+  leaf1.position.set(x, 0.4, z)
+  scene.add(leaf1)
+
+  const leaf2 = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8), leafMat)
+  leaf2.position.set(x - 0.1, 0.5, z + 0.05)
+  scene.add(leaf2)
+}
+
+// Procedural Chibi character builder
+const buildChibiCharacter = (color: number, brightColor: number) => {
+  const group = new THREE.Group()
+
+  // 1. Cylinder Round Body
+  const bodyGeo = new THREE.CylinderGeometry(0.18, 0.24, 0.5, 12)
+  const bodyMat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.5 })
+  const body = new THREE.Mesh(bodyGeo, bodyMat)
+  body.position.y = 0.25
+  group.add(body)
+
+  // 2. Chibi Sphere Head
+  const headGeo = new THREE.SphereGeometry(0.22, 16, 16)
+  const headMat = new THREE.MeshStandardMaterial({ color: 0xfca5a5, roughness: 0.6 }) // skin-like cute tone
+  const head = new THREE.Mesh(headGeo, headMat)
+  head.position.y = 0.6
+  group.add(head)
+
+  // 3. Cyber neon glowing visor on head face (pointing forward: +Z direction)
+  const visorGeo = new THREE.BoxGeometry(0.28, 0.09, 0.06)
+  const visorMat = new THREE.MeshStandardMaterial({
+    color: 0x0f172a,
+    emissive: brightColor,
+    emissiveIntensity: 1.0
+  })
+  const visor = new THREE.Mesh(visorGeo, visorMat)
+  visor.position.set(0, 0.62, 0.18)
+  group.add(visor)
+
+  // 4. Little round feet
+  const shoeMat = new THREE.MeshStandardMaterial({ color: 0x1e293b })
+  const footL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.12), shoeMat)
+  footL.position.set(-0.09, 0.03, 0.02)
+  group.add(footL)
+
+  const footR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.12), shoeMat)
+  footR.position.set(0.09, 0.03, 0.02)
+  group.add(footR)
+
+  return group
+}
+
+// Mouse dragging controls for perspective orbiting
+const onMouseDown = (e: MouseEvent) => {
+  isDraggingCamera = true
+  previousMousePosition = { x: e.clientX, y: e.clientY }
+}
+
+const onMouseMove = (e: MouseEvent) => {
+  if (!isDraggingCamera || !camera) return
+
+  const deltaX = e.clientX - previousMousePosition.x
+  const deltaY = e.clientY - previousMousePosition.y
+
+  theta -= deltaX * 0.005
+  phi = Math.max(0.12, Math.min(Math.PI / 2 - 0.12, phi - deltaY * 0.005))
+
+  previousMousePosition = { x: e.clientX, y: e.clientY }
+  updateCameraPosition()
+}
+
+const onMouseUp = () => {
+  isDraggingCamera = false
+}
+
+const updateCameraPosition = () => {
+  if (!camera) return
+  camera.position.x = radius * Math.sin(theta) * Math.cos(phi)
+  camera.position.y = radius * Math.sin(phi)
+  camera.position.z = radius * Math.cos(theta) * Math.cos(phi)
+  camera.lookAt(0, 0.45, 0)
+}
+
+const handleResize = () => {
+  if (!canvasContainer.value || !camera || !renderer) return
+  const w = canvasContainer.value.clientWidth
+  const h = canvasContainer.value.clientHeight
+  camera.aspect = w / h
+  camera.updateProjectionMatrix()
+  renderer.setSize(w, h)
+}
+
+// Animate loop with physics, waddles and projected dialogue coordinate projects
+const animate = () => {
+  if (!scene || !renderer || !camera) return
+  animFrameId = requestAnimationFrame(animate)
+
+  const time = Date.now() * 0.001
+
+  // Walk physics simulation for all characters
+  const moveTowardsTarget = (mesh: THREE.Group | null, target: THREE.Vector3, speed: number, characterName: string) => {
+    if (!mesh) return
+
+    const currentPos = mesh.position
+    const dir = new THREE.Vector3().copy(target).sub(currentPos)
+    const dist = dir.length()
+
+    if (dist > 0.06) {
+      // 1. Waddling animation: Translate position and face direction
+      dir.normalize()
+      currentPos.add(dir.multiplyScalar(speed))
+
+      const targetRotationY = Math.atan2(dir.x, dir.z)
+      mesh.rotation.y = targetRotationY
+
+      // Bounce and swing legs!
+      mesh.position.y = STAND_HEIGHT + Math.abs(Math.sin(time * 12)) * 0.1
+      mesh.rotation.z = Math.sin(time * 12) * 0.06
+    } else {
+      // 2. Sit/Stand idle and snap facing direction
+      mesh.position.copy(target)
+      mesh.rotation.z = 0
+
+      // Face the desk or each other depending on character state
+      if (characterName === 'planner') {
+        const state = sandboxState.value.activeSpeaker
+        if (state === 'browser' && plannerTarget.equals(plannerChairPos)) {
+          // Look at browser standing next to planner's desk
+          mesh.rotation.y = 90 * Math.PI / 180
+          mesh.position.y = CHAIR_HEIGHT
+        } else if (plannerTarget.equals(plannerChairPos)) {
+          // Look forward at computer
+          mesh.rotation.y = 180 * Math.PI / 180
+          mesh.position.y = CHAIR_HEIGHT
+        } else if (plannerTarget.equals(browserDeskPos)) {
+          // Stand next to browser desk and look at browser
+          mesh.rotation.y = 90 * Math.PI / 180
+          mesh.position.y = STAND_HEIGHT
+        } else if (plannerTarget.equals(devDeskPos)) {
+          // Stand next to dev and look at dev
+          mesh.rotation.y = 0 * Math.PI / 180
+          mesh.position.y = STAND_HEIGHT
+        }
+      } 
+      
+      else if (characterName === 'browser') {
+        if (browserTarget.equals(browserChairPos)) {
+          mesh.rotation.y = 180 * Math.PI / 180
+          mesh.position.y = CHAIR_HEIGHT
+        } else if (browserTarget.equals(plannerDeskPos)) {
+          mesh.rotation.y = -90 * Math.PI / 180
+          mesh.position.y = STAND_HEIGHT
+        }
+      } 
+      
+      else if (characterName === 'developer') {
+        mesh.rotation.y = 0 * Math.PI / 180
+        mesh.position.y = CHAIR_HEIGHT
+      }
+    }
+  }
+
+  // Animate walking speeds
+  moveTowardsTarget(devMesh, devTarget, 0.06, 'developer')
+  moveTowardsTarget(plannerMesh, plannerTarget, 0.065, 'planner')
+  moveTowardsTarget(browserMesh, browserTarget, 0.065, 'browser')
+
+  // Fluctuating Computer Screen emissive light intensity based on active speaker
+  const pulseScale = Math.sin(time * 6) * 0.15 + 0.85
+  if (devScreenMat) devScreenMat.emissiveIntensity = sandboxState.value.activeSpeaker === 'developer' ? 1.4 * pulseScale : 0.4
+  if (plannerScreenMat) plannerScreenMat.emissiveIntensity = sandboxState.value.activeSpeaker === 'planner' ? 1.4 * pulseScale : 0.4
+  if (browserScreenMat) browserScreenMat.emissiveIntensity = sandboxState.value.browserState === 'working' ? 1.4 * pulseScale : 0.4
+
+  // Render Three Scene
+  renderer.render(scene, camera)
+
+  // Project 3D Speech bubbles into HTML screen overlays coordinates!
+  projectDialogueBubbles()
+}
+
+// 3D coordinate Vector to 2D Screen Projection projection helper
+const projectDialogueBubbles = () => {
+  if (!camera || !renderer || !canvasContainer.value) return
+
+  const width = canvasContainer.value.clientWidth
+  const height = canvasContainer.value.clientHeight
+
+  const projectNode = (mesh: THREE.Group | null, refVar: any) => {
+    if (!mesh) {
+      refVar.value = { x: -1000, y: -1000 }
+      return
+    }
+
+    const vector = new THREE.Vector3()
+    mesh.getWorldPosition(vector)
+    vector.y += 0.85 // height offset above head
+
+    vector.project(camera!)
+
+    const x = (vector.x * 0.5 + 0.5) * width
+    const y = (-(vector.y * 0.5) + 0.5) * height
+
+    // Hide bubbles if they project behind the camera viewport
+    if (vector.z > 1) {
+      refVar.value = { x: -1000, y: -1000 }
+    } else {
+      refVar.value = { x, y }
+    }
+  }
+
+  projectNode(devMesh, devBubblePos)
+  projectNode(plannerMesh, plannerBubblePos)
+  projectNode(browserMesh, browserBubblePos)
+}
+
+// Coordinate Target calculation watchers mapping event timeline to 3D targets
+const sync3DTargetsWithState = () => {
+  const list = activeTraceMsg.value?.toolResults || []
+  if (list.length === 0) {
+    devTarget.copy(devChairPos)
+    plannerTarget.copy(plannerChairPos)
+    browserTarget.copy(browserChairPos)
+    return
+  }
+
+  const lastItem = list[list.length - 1]
+  const type = lastItem.eventType
+
+  if (type === 'stopped') {
+    devTarget.copy(devChairPos)
+    plannerTarget.copy(plannerChairPos)
+    browserTarget.copy(browserChairPos)
+  } else if (type === 'plan') {
+    devTarget.copy(devChairPos)
+    plannerTarget.copy(plannerChairPos)
+    browserTarget.copy(browserChairPos)
+  } else if (type === 'agent_call') {
+    // Planner walks over to Browser's workstation to deliver data package
+    plannerTarget.copy(browserDeskPos)
+    devTarget.copy(devChairPos)
+    browserTarget.copy(browserChairPos)
+  } else if (type === 'tool_call') {
+    // Browser is working, Planner stays next to Browser desk collaborating
+    plannerTarget.copy(browserDeskPos)
+    devTarget.copy(devChairPos)
+    browserTarget.copy(browserChairPos)
+  } else if (type === 'tool_result') {
+    // Browser stands up and walks over to Planner desk to submit results
+    browserTarget.copy(plannerDeskPos)
+    plannerTarget.copy(plannerChairPos)
+    devTarget.copy(devChairPos)
+  } else if (type === 'summary') {
+    // Planner sits back at chair compiling data, Browser walks back to sit
+    plannerTarget.copy(plannerChairPos)
+    browserTarget.copy(browserChairPos)
+    devTarget.copy(devChairPos)
+  } else if (type === 'answer') {
+    // Planner stands up and walks to developer desk to hand in final reports
+    plannerTarget.copy(devDeskPos)
+    devTarget.copy(devChairPos)
+    browserTarget.copy(browserChairPos)
+  }
+}
+
+watch(activeTab, (newTab) => {
+  if (newTab === 'sandbox') {
+    nextTick(() => {
+      initThreeScene()
+      sync3DTargetsWithState()
+    })
+  } else {
+    cleanThreeScene()
+  }
+})
+
+const cleanThreeScene = () => {
+  if (animFrameId) {
+    cancelAnimationFrame(animFrameId)
+    animFrameId = null
+  }
+
+  // Clean events
+  if (renderer && renderer.domElement) {
+    const canvas = renderer.domElement
+    canvas.removeEventListener('mousedown', onMouseDown)
+  }
+  window.removeEventListener('mousemove', onMouseMove)
+  window.removeEventListener('mouseup', onMouseUp)
+  window.removeEventListener('resize', handleResize)
+
+  // Empty container
+  if (canvasContainer.value) {
+    canvasContainer.value.innerHTML = ''
+  }
+
+  scene = null
+  camera = null
+  renderer = null
+  devMesh = null
+  plannerMesh = null
+  browserMesh = null
+  devScreenMat = null
+  plannerScreenMat = null
+  browserScreenMat = null
+}
+
+onMounted(() => {
+  nextTick(() => {
+    if (activeTab.value === 'sandbox') {
+      initThreeScene()
+      sync3DTargetsWithState()
+    }
+  })
+})
+
+onUnmounted(() => {
+  cleanThreeScene()
+})
+
+// Watch toolResults to dynamically recalculate 3D targets in real-time
 const toolResultsLength = computed(() => {
   return activeTraceMsg.value?.toolResults?.length || 0
 })
 
-watch(toolResultsLength, (newLength, oldLength) => {
+watch(toolResultsLength, (newLength) => {
   nextTick(() => {
-    // 1. By default, automatically expand newly arrived execution trace nodes
-    if (newLength > 0) {
-      expandedItems.value[newLength - 1] = true
+    // 1. Recalculate 3D walking targets
+    if (activeTab.value === 'sandbox') {
+      sync3DTargetsWithState()
     }
-    
-    // 2. Trigger glowing data flying particles DTO inside sandbox
-    if (newLength > oldLength && newLength > 0) {
-      const list = activeTraceMsg.value?.toolResults || []
-      const lastItem = list[list.length - 1]
-      const type = lastItem.eventType
-      
-      let packetType = ''
-      if (type === 'plan') {
-        packetType = 'dev-to-planner'
-      } else if (type === 'agent_call') {
-        packetType = 'planner-to-browser'
-      } else if (type === 'tool_result') {
-        packetType = 'browser-to-planner'
-      } else if (type === 'answer') {
-        packetType = 'planner-to-dev'
-      }
-      
-      if (packetType) {
-        flyingPacket.value = { type: packetType }
-        setTimeout(() => {
-          flyingPacket.value = null
-        }, 800) // Match 0.8s CSS flight keyframe animation
-      }
-    }
-    
-    // 3. Keep standard timeline scrolled down
+
+    // 2. Keep standard timeline scrolled down
     if (rightPanelContent.value) {
       rightPanelContent.value.scrollTop = rightPanelContent.value.scrollHeight
     }
