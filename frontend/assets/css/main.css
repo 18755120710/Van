@@ -2497,3 +2497,95 @@ h1, h2, h3, h4, h5, h6 {
   100% { left: 50%; top: 12%; opacity: 0; transform: scale(0.5); }
 }
 
+/* ==========================================
+   THREE.JS 3D OFFICE SIMULATION SYSTEM STYLES
+   ========================================== */
+
+.three-canvas-container {
+  width: 100%;
+  height: 350px;
+  background: radial-gradient(circle at 50% 0%, #1f1f2e 0%, #0d0d15 100%);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 32px rgba(0, 0, 0, 0.7), 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.three-canvas-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.three-canvas-container canvas:active {
+  cursor: grabbing;
+}
+
+/* Screen coordinate projection overlays container */
+.three-bubble-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* projected speech bubble styling */
+.three-bubble {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  background: rgba(9, 9, 11, 0.94);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.6rem;
+  font-size: 0.7rem;
+  color: #e4e4e7;
+  width: 150px;
+  max-height: 84px;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+  animation: bubbleBounce 0.22s cubic-bezier(0.2, 0.8, 0.2, 1.25) forwards;
+}
+
+.three-bubble::-webkit-scrollbar {
+  width: 2px;
+}
+.three-bubble::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.three-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 9px;
+  height: 9px;
+  background: rgba(9, 9, 11, 0.94);
+  border-right: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Glowing text label on 3D objects */
+.three-hud-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+  font-family: monospace;
+  z-index: 10;
+}
+
