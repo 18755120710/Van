@@ -20,7 +20,7 @@ public class PlaywrightManager {
         this.browser = playwright.chromium().launch(
                 new BrowserType.LaunchOptions()
                         // 开发阶段可以设置成false，可以看到浏览器操作
-                        .setHeadless(false)
+                        .setHeadless(true)
         );
     }
 

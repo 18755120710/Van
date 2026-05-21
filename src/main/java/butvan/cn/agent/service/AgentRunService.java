@@ -3,6 +3,8 @@ package butvan.cn.agent.service;
 import butvan.cn.agent.browser.runtime.AgentExecutionHandle;
 import butvan.cn.agent.browser.runtime.AgentExecutionRegistry;
 import butvan.cn.agent.planner.PlannerAgentFactory;
+import butvan.cn.agent.trace.TokenUsageRegistry;
+import butvan.cn.agent.trace.TokenUsageStates;
 import butvan.cn.agent.trace.TraceContextRegistry;
 import butvan.cn.common.security.SessionIdSanitizer;
 import butvan.cn.conversation.model.UiMessage;
@@ -32,6 +34,7 @@ public class AgentRunService {
     private final PlannerAgentFactory plannerAgentFactory;
     private final TraceContextRegistry traceContextRegistry;
     private final AgentExecutionRegistry agentExecutionRegistry;
+    private final TokenUsageRegistry tokenUsageRegistry;
     private final ChatHistoryService chatHistoryService;
 
     @Value("${memory.session-dir:./memory/sessions}")
@@ -114,6 +117,8 @@ public class AgentRunService {
                 if (type == EventType.AGENT_RESULT) {
                     // 标识agent最终结果
                     String final_text = answer_started.get() ? answer_buffer.toString() : text;
+
+                    sendTokenMessage(session,traceId);
 
                     session.sendMessage(DialogMessageDTO.builder()
                             .type(DialogMessageDTO.TYPE_SERVER)
@@ -224,6 +229,9 @@ public class AgentRunService {
                         .build());
             }
         } finally {
+
+            tokenUsageRegistry.clear(traceId);
+
             /**
              * 当前轮执行结束后清理 traceId。
              */
@@ -267,5 +275,36 @@ public class AgentRunService {
                 .text(stopped ? "已停止当前 Agent 执行。" : "当前没有正在执行的 Agent。")
                 .build());
 
+    }
+
+    private void sendTokenMessage(MessageSession session, String traceId) {
+        TokenUsageStates stats = tokenUsageRegistry.get(traceId);
+
+        if (stats == null) return;
+
+        String text = """
+            本轮大模型消耗：
+            输入 Token：%d
+            输出 Token：%d
+            总 Token：%d
+            模型调用次数：%d
+            模型总耗时：%.2f 秒
+            """.formatted(
+                stats.getInputTokens(),
+                stats.getOutputTokens(),
+                stats.getTotalTokens(),
+                stats.getModelCallCount(),
+                stats.getTotalTime()
+        );
+
+        session.sendMessage(DialogMessageDTO.builder()
+                        .type(DialogMessageDTO.TYPE_SERVER)
+                        .traceId(traceId)
+                        .eventType("token_usage")
+                        .agentName("AgentScope")
+                        .trace(true)
+                        .done(false)
+                        .text(text)
+                .build());
     }
 }

@@ -2,6 +2,7 @@ package butvan.cn.agent.planner;
 
 import butvan.cn.agent.prompt.PromptManagement;
 import butvan.cn.agent.trace.AgentTraceHook;
+import butvan.cn.agent.trace.TokenUsageRegistry;
 import butvan.cn.agent.trace.TraceContextRegistry;
 import butvan.cn.configcenter.service.AgentModelProvider;
 import butvan.cn.websocket.session.MessageSession;
@@ -33,6 +34,7 @@ public class PlannerAgentFactory {
     private final PlannerToolkitFactory plannerToolkitFactory;
     private final PromptManagement promptManagement;
     private final TraceContextRegistry traceContextRegistry;
+    private final TokenUsageRegistry tokenUsageRegistry;
 
     public ReActAgent create(MessageSession messageSession, String traceId) {
         Toolkit toolkit = plannerToolkitFactory.createForSession(messageSession,traceId);
@@ -58,7 +60,7 @@ public class PlannerAgentFactory {
                 .memory(new InMemoryMemory())
                 .toolkit(toolkit)
                 .planNotebook(plan_note_book)
-                .hook(new AgentTraceHook(messageSession, traceContextRegistry))
+                .hook(new AgentTraceHook(messageSession, traceContextRegistry,tokenUsageRegistry))
                 .maxIters(30)
                 .build();
     }

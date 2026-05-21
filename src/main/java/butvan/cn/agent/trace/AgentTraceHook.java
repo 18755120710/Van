@@ -23,19 +23,15 @@ public class AgentTraceHook implements Hook {
      * 都使用同一个 trace_id
      */
     private final TraceContextRegistry traceContextRegistry;
+    private final TokenUsageRegistry tokenUsageRegistry;
 
     @Override
     public <T extends HookEvent> Mono<T> onEvent(T event) {
 
-        /**
-         * 工具调用前触发。
-         *
-         * 这里适合告诉前端：
-         * - PlannerAgent 准备创建计划
-         * - PlannerAgent 准备调用 BrowserAgent
-         * - BrowserAgent 准备打开网页
-         * - BrowserAgent 准备提取页面内容
-         */
+        if (event instanceof PostReasoningEvent e) {
+            handlePostReasoning(e);
+            return Mono.just(event);
+        }
         if (event instanceof PreActingEvent e) {
             handlePreActing(e);
             return Mono.just(event);
@@ -58,6 +54,23 @@ public class AgentTraceHook implements Hook {
         }
 
         return Mono.just(event);
+    }
+
+    /**
+     * 处理一次大模型 reasoning 完成后的 token usage
+     * @param e
+     */
+    private void handlePostReasoning(PostReasoningEvent e) {
+        String trace_id = traceContextRegistry.getCurrentTraceId(session.getSessionId());
+
+        if (trace_id == null || trace_id.isBlank() || e.getReasoningMessage() == null) {
+            return;
+        }
+
+        tokenUsageRegistry.record(
+                trace_id,
+                e.getReasoningMessage().getChatUsage()
+        );
     }
 
     private void handlePreActing(PreActingEvent event) {
