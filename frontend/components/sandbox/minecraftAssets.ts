@@ -568,20 +568,31 @@ export const createFloor = () => {
   // 极简纯白墙壁材质
   const wallMat = createMaterial(0xffffff, { roughness: 0.98, metalness: 0.0 })
 
-  // 极简纯白左背景墙 (X 轴负方向，Z 跨度 7.6，高 4.0)
-  const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(7.6, 4.0), wallMat)
-  leftWall.position.set(-4.6, 2.0, 0)
-  leftWall.rotation.y = Math.PI / 2 // 面朝右侧
-  leftWall.receiveShadow = true
-  leftWall.castShadow = true
-  root.add(leftWall)
-
-  // 极简纯白后背景墙 (Z 轴负方向，X 跨度 9.2，高 4.0)
+  // 极简纯白后背景墙 (Z 轴负方向，X 跨度 9.2，高 4.0)，设置为不投射阴影，以保持办公室地面的明亮纯白
   const backWall = new THREE.Mesh(new THREE.PlaneGeometry(9.2, 4.0), wallMat)
   backWall.position.set(0, 2.0, -3.8) // 紧贴后边缘
   backWall.receiveShadow = true
-  backWall.castShadow = true
+  backWall.castShadow = false // 彻底杜绝墙体投射巨大三角阴影！
   root.add(backWall)
+
+  // ---------------------------------------------------------------------------
+  // 在后墙上拼接一扇精美高档的办公室大门 (X = 2.0, Z = -3.8)
+  // ---------------------------------------------------------------------------
+  const frameColor = 0x3f3f46 // 深灰黑色门框
+  const woodColor = 0xb45309  // 暖胡桃木色门扇
+  const handleColor = 0x18181b // 亮黑色五金把手
+
+  // 左右门框及上门框体素
+  addBox(root, 0.04, 1.9, 0.04, frameColor, [2.0 - 0.44, 0.95, -3.76]) // 左门框
+  addBox(root, 0.04, 1.9, 0.04, frameColor, [2.0 + 0.44, 0.95, -3.76]) // 右门框
+  addBox(root, 0.92, 0.04, 0.04, frameColor, [2.0, 1.9, -3.76])       // 上门框
+
+  // 温暖胡桃木门页
+  addBox(root, 0.84, 1.86, 0.02, woodColor, [2.0, 0.93, -3.77], { roughness: 0.6, metalness: 0.1 })
+
+  // 极细致的极简黑色门锁与横向拉手
+  addBox(root, 0.025, 0.1, 0.03, handleColor, [2.0 + 0.32, 0.9, -3.74]) // 锁扣底板
+  addBox(root, 0.08, 0.02, 0.02, handleColor, [2.0 + 0.28, 0.93, -3.72]) // 横执手手柄
 
   // 极柔和、朦胧的极淡灰色瓷砖板块分割线，限定在核心办公室网格 (9.2 x 7.6) 内，丰富工位区域的现代纹理
   const gridColor = 0xf3f4f6
