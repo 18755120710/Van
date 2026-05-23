@@ -615,7 +615,133 @@ export const createFloor = () => {
   return root
 }
 
-// 清理缓存材质，防内存泄露
+// ---------------------------------------------------------------------------
+// 9. 生机盎然的“活力细节”体素组件 (橘猫、氛围台灯、下午茶甜点礼盒、极客工位废纸篓)
+// ---------------------------------------------------------------------------
+
+// 9.1 超萌 3D 像素橘猫 (Office Cat)
+export const createOfficeCat = () => {
+  const root = new THREE.Group()
+  // 身体 (橙色 0xf97316)
+  const catBody = addBox(root, 0.18, 0.12, 0.24, 0xf97316, [0, 0.06, 0])
+  catBody.castShadow = false
+  catBody.receiveShadow = true
+  
+  // 头部 (橙色 0xf97316)
+  const catHead = addBox(root, 0.14, 0.12, 0.12, 0xf97316, [0, 0.15, -0.06])
+  catHead.castShadow = false
+  
+  // 两个微翘的尖耳朵 (橙色 0xf97316)
+  const catEarL = addBox(root, 0.04, 0.04, 0.04, 0xf97316, [-0.04, 0.22, -0.06])
+  const catEarR = addBox(root, 0.04, 0.04, 0.04, 0xf97316, [0.04, 0.22, -0.06])
+  catEarL.castShadow = false
+  catEarR.castShadow = false
+  
+  // 粉红色小鼻子
+  const catNose = addBox(root, 0.03, 0.03, 0.02, 0xf43f5e, [0, 0.13, -0.13])
+  catNose.castShadow = false
+  
+  // 白色胸脯
+  const catChest = addBox(root, 0.12, 0.08, 0.02, 0xffffff, [0, 0.06, -0.122])
+  catChest.castShadow = false
+  
+  // 向上弯立的橘色尾巴
+  const catTail = addBox(root, 0.03, 0.15, 0.03, 0xf97316, [0, 0.15, 0.11], { roughness: 0.5 })
+  catTail.rotation.x = Math.PI / 6
+  catTail.castShadow = false
+  
+  // 四个白色萌系小爪爪
+  const pawFL = addBox(root, 0.04, 0.04, 0.04, 0xffffff, [-0.06, 0.02, -0.08])
+  const pawFR = addBox(root, 0.04, 0.04, 0.04, 0xffffff, [0.06, 0.02, -0.08])
+  const pawBL = addBox(root, 0.04, 0.04, 0.04, 0xffffff, [-0.06, 0.02, 0.08])
+  const pawBR = addBox(root, 0.04, 0.04, 0.04, 0xffffff, [0.06, 0.02, 0.08])
+  pawFL.castShadow = false
+  pawFR.castShadow = false
+  pawBL.castShadow = false
+  pawBR.castShadow = false
+
+  return root
+}
+
+// 9.2 PM 桌角北欧氛围台灯 (Desk Lamp)
+export const createDeskLamp = () => {
+  const root = new THREE.Group()
+  // 扁平曜石黑底座
+  const base = addBox(root, 0.08, 0.015, 0.08, 0x18181b, [0, 0.007, 0])
+  base.castShadow = false
+  
+  // 极细亮银金属灯杆
+  const stand1 = addBox(root, 0.015, 0.18, 0.015, 0xd4d4d8, [0, 0.09, 0], { roughness: 0.1, metalness: 0.9 })
+  const stand2 = addBox(root, 0.015, 0.015, 0.08, 0xd4d4d8, [0, 0.18, -0.04], { roughness: 0.1, metalness: 0.9 })
+  stand1.castShadow = false
+  stand2.castShadow = false
+  
+  // 暖黄色发光灯罩 (自发光，在白底子中非常亮眼温馨)
+  const lampHead = addBox(root, 0.06, 0.06, 0.06, 0xfef08a, [0, 0.16, -0.08], {
+    emissive: 0xfacc15,
+    emissiveIntensity: 0.85,
+    roughness: 0.2
+  })
+  lampHead.castShadow = false
+
+  return root
+}
+
+// 9.3 吧台下午茶草莓甜点礼盒 (Sweet Donut Box)
+export const createSweetDonutBox = () => {
+  const root = new THREE.Group()
+  // 白色扁平底托盘
+  const plate = addBox(root, 0.24, 0.02, 0.24, 0xf8fafc, [0, 0.01, 0])
+  plate.castShadow = false
+  plate.receiveShadow = true
+  
+  // 粉红色草莓甜甜圈 (Donut 1)
+  const donut1 = addBox(root, 0.07, 0.03, 0.07, 0xf472b6, [-0.05, 0.03, -0.05])
+  donut1.castShadow = false
+  // 巧克力色甜甜圈 (Donut 2)
+  const donut2 = addBox(root, 0.07, 0.03, 0.07, 0x78350f, [0.05, 0.03, -0.05])
+  donut2.castShadow = false
+  // 抹茶绿色甜甜圈 (Donut 3)
+  const donut3 = addBox(root, 0.07, 0.03, 0.07, 0x10b981, [0, 0.03, 0.05])
+  donut3.castShadow = false
+  
+  // 透明半开启的包装盒盖
+  const lid = addBox(root, 0.26, 0.12, 0.26, 0xe2e8f0, [0, 0.08, 0], {
+    transparent: true,
+    opacity: 0.4,
+    roughness: 0.05
+  })
+  lid.rotation.x = -Math.PI / 12 // 微微斜开露出下午茶的可爱
+  lid.castShadow = false
+
+  return root
+}
+
+// 9.4 极客工位旁精细废纸篓 (Tiny Wastebin)
+export const createTinyWastebin = () => {
+  const root = new THREE.Group()
+  // 纸篓底座
+  const base = addBox(root, 0.14, 0.02, 0.14, 0x3f3f46, [0, 0.01, 0], { roughness: 0.7 })
+  base.castShadow = false
+  
+  // 筒壁四面
+  const wallF = addBox(root, 0.14, 0.18, 0.02, 0x52525b, [0, 0.09, 0.06], { roughness: 0.7 })
+  const wallB = addBox(root, 0.14, 0.18, 0.02, 0x52525b, [0, 0.09, -0.06], { roughness: 0.7 })
+  const wallL = addBox(root, 0.02, 0.18, 0.1, 0x52525b, [-0.06, 0.09, 0], { roughness: 0.7 })
+  const wallR = addBox(root, 0.02, 0.18, 0.1, 0x52525b, [0.06, 0.09, 0], { roughness: 0.7 })
+  wallF.castShadow = false; wallB.castShadow = false; wallL.castShadow = false; wallR.castShadow = false;
+  
+  // 桶里的白色废纸团 (很有办公室敲代码思考的感觉)
+  const paper1 = addBox(root, 0.05, 0.05, 0.05, 0xf8fafc, [0.02, 0.15, 0.01], { roughness: 0.9 })
+  const paper2 = addBox(root, 0.06, 0.06, 0.06, 0xf8fafc, [-0.01, 0.1, -0.02], { roughness: 0.9 })
+  paper1.castShadow = false
+  paper2.castShadow = false
+
+  return root
+}
+
+// ---------------------------------------------------------------------------
+
 export const disposeSharedMaterials = () => {
   materialCache.forEach((mat) => mat.dispose())
   materialCache.clear()

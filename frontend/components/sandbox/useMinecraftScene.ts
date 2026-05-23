@@ -11,6 +11,10 @@ import {
   createCoffeeStation,
   createTreadmill,
   createRestroom,
+  createOfficeCat,
+  createDeskLamp,
+  createSweetDonutBox,
+  createTinyWastebin,
   disposeSharedMaterials
 } from './minecraftAssets'
 import type { MinecraftSandboxState, RoleAnchorMap, SandboxRole, ScreenPoint } from './types'
@@ -205,6 +209,27 @@ export class MinecraftSandboxScene {
     const plantRight = createPlant()
     plantRight.position.set(3.3, 0, 0.8)
     this.scene.add(plantRight)
+
+    // 3.5 部署 4 大生机盎然的“活力细节” (橘猫、氛围台灯、下午茶甜点礼盒、极客工位废纸篓)
+    // 1) 超萌像素橘猫 (Office Cat) 位于白板与工位间的空地
+    const officeCat = createOfficeCat()
+    officeCat.position.set(-0.8, 0, 1.3)
+    this.scene.add(officeCat)
+
+    // 2) PM 办公桌角温暖氛围台灯
+    const deskLamp = createDeskLamp()
+    deskLamp.position.set(0.7, 0.63, -1.8)
+    this.scene.add(deskLamp)
+
+    // 3) 咖啡吧台面上的草莓甜甜圈礼盒
+    const donutBox = createSweetDonutBox()
+    donutBox.position.set(-2.8, 0.9, -1.8)
+    this.scene.add(donutBox)
+
+    // 4) Planner 工位旁精细废纸篓
+    const wastebin = createTinyWastebin()
+    wastebin.position.set(0.2, 0, 1.0)
+    this.scene.add(wastebin)
   }
 
   // 部署工作台与转椅
