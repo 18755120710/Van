@@ -114,7 +114,7 @@ export class MinecraftSandboxScene {
 
   private buildScene() {
     // 调高全局透亮的环境光，渲染明净办公室的感官
-    const ambient = new THREE.AmbientLight(0xffffff, 0.95)
+    const ambient = new THREE.AmbientLight(0xffffff, 1.3)
     this.scene.add(ambient)
 
     // 精细布置的斜向主光源，渲染柔和立体的软阴影 (SoftShadow)

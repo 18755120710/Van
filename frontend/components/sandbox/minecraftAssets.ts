@@ -553,17 +553,27 @@ export const createFileCabinet = () => {
 export const createFloor = () => {
   const root = new THREE.Group()
   
-  // 加宽、变长，适应包含生活区与工作区在内的优雅三维画卷 (9.2 x 0.1 x 7.6)
-  const floorColor = 0xffffff // 极简纯白
-  addBox(root, 9.2, 0.1, 7.6, floorColor, [0, -0.05, 0], { roughness: 0.3, metalness: 0.02 })
+  // 使用超大平面铺满整个镜头视野 (100 * 100)，彻底消灭边缘物理切线和空岛悬浮感
+  const floorMat = createMaterial(0xffffff, {
+    roughness: 0.9,
+    metalness: 0.0,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.52 // 自发光强力提亮，完全中和漫反射损耗，完美匹配 #ffffff 背景
+  })
+  
+  const floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), floorMat)
+  floorMesh.rotation.x = -Math.PI / 2
+  floorMesh.position.y = 0.002 // 极微抬高避开渲染底平面冲突
+  floorMesh.receiveShadow = true
+  root.add(floorMesh)
 
-  // 极柔和、无喧宾夺主的极淡灰色板块分割线（体现大块大理石地砖的高档感）
+  // 极柔和、朦胧的极淡灰色瓷砖板块分割线，限定在核心办公室网格 (9.2 x 7.6) 内，丰富工位区域的现代纹理
   const gridColor = 0xf3f4f6
   for (let x = -4; x <= 4; x += 2) {
-    addBox(root, 0.015, 0.008, 7.6, gridColor, [x, 0.005, 0], { roughness: 0.5 })
+    addBox(root, 0.015, 0.005, 7.6, gridColor, [x, 0.005, 0], { roughness: 0.5 })
   }
   for (let z = -3; z <= 3; z += 2) {
-    addBox(root, 9.2, 0.008, 0.015, gridColor, [0, 0.005, z], { roughness: 0.5 })
+    addBox(root, 9.2, 0.005, 0.015, gridColor, [0, 0.005, z], { roughness: 0.5 })
   }
 
   return root
