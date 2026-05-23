@@ -10,6 +10,11 @@ agentscope:
   react:
     max-iters: 30
     max-actions-per-call: 5
+    browser-max-iters: 8
+  token-budget:
+    simple-chat-max-input: 800
+    planner-warning-input: 3000
+    planner-hard-limit-input: 8000
 
 memory:
     session-dir: ./memory/sessions

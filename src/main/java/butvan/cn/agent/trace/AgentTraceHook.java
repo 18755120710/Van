@@ -28,6 +28,10 @@ public class AgentTraceHook implements Hook {
     @Override
     public <T extends HookEvent> Mono<T> onEvent(T event) {
 
+        if (traceContextRegistry.isStopped(session.getSessionId())) {
+            return Mono.just(event);
+        }
+
         if (event instanceof PostReasoningEvent e) {
             handlePostReasoning(e);
             return Mono.just(event);
@@ -157,6 +161,14 @@ public class AgentTraceHook implements Hook {
          * 表示 BrowserAgent 已经返回执行结果。
          */
         if ("use_browser_agent".equals(toolName)) {
+            // 如果用户已经停止，或者工具返回本身表示停止/失败，
+            // 不要再向前端发送“BrowserAgent 执行完成”这种误导性消息。
+            if (traceContextRegistry.isStopped(session.getSessionId())
+                    || resultText.contains("已被用户停止")
+                    || resultText.contains("执行失败")
+                    || resultText.contains("Tool execution failed")) {
+                return;
+            }
             sendTrace(
                     "agent_call",
                     agentName,
@@ -283,6 +295,10 @@ public class AgentTraceHook implements Hook {
             String text,
             boolean done
     ) {
+        if (traceContextRegistry.isStopped(session.getSessionId())) {
+            return;
+        }
+
         String trace_id = traceContextRegistry.getCurrentTraceId(session.getSessionId());
         if (trace_id == null) {
             trace_id = "unknown-" + session.getSessionId();

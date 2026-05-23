@@ -13,6 +13,8 @@ public class AgentScopeProperties {
 
     private ReActProperties reAct = new ReActProperties();
 
+    private TokenBudgetProperties tokenBudget = new TokenBudgetProperties();
+
 
     @Data
     public static class ModelProperties {
@@ -26,5 +28,13 @@ public class AgentScopeProperties {
     public static class ReActProperties {
         private int maxIters = 30;
         private int maxActionsPerCall = 5;
+        private int browserMaxIters = 8;
+    }
+
+    @Data
+    public static class TokenBudgetProperties {
+        private int SimpleChatMaxInput = 800;
+        private int PlannerWarningInput = 3000;
+        private int PlannerHardLimitInput = 8000;
     }
 }

@@ -37,6 +37,8 @@ public class AgentExecutionHandle {
     private final String traceId;
     // 正在运行的 planner agent
     private ReActAgent plannerAgent;
+    // 当前正在运行的 agent
+    private ReActAgent browserAgent;
     // 正在运行或者复用的 browser agent runtime
     private BrowserAgentRuntime browserAgentRuntime;
     // reactor stream 订阅句柄

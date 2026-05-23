@@ -8,7 +8,7 @@ import io.agentscope.core.tool.ToolParam;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class BrowserToolkit {
+public class  BrowserToolkit {
 
     private final PageSession pageSession;
 

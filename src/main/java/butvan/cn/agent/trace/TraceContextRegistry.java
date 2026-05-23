@@ -3,10 +3,16 @@ package butvan.cn.agent.trace;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class TraceContextRegistry {
+
+    /**
+     * 已经请求停止的sessionId
+     */
+    private final Set<String> stoppedSessions = ConcurrentHashMap.newKeySet();
 
     /**
      * sessionId -> 当前正在执行的 traceId
@@ -44,4 +50,30 @@ public class TraceContextRegistry {
     public void clear(String sessionId) {
         currentTraceIds.remove(sessionId);
     }
+
+    /**
+     * 标记当前session 已经请求停止
+     */
+    public void markStopped(String sessionId) {
+        if (sessionId != null && !sessionId.isBlank()) {
+            stoppedSessions.add(sessionId);
+        }
+    }
+
+    /**
+     * 判断当前 session 是否已经请求停止。
+     */
+    public boolean isStopped(String sessionId) {
+        return sessionId != null && stoppedSessions.contains(sessionId);
+    }
+
+    /**
+     * 新任务开始时清理停止标记。
+     */
+    public void clearStopped(String sessionId) {
+        if (sessionId != null && !sessionId.isBlank()) {
+            stoppedSessions.remove(sessionId);
+        }
+    }
+
 }

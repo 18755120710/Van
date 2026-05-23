@@ -2,7 +2,10 @@ package butvan.cn.agent.service;
 
 import butvan.cn.agent.browser.runtime.AgentExecutionHandle;
 import butvan.cn.agent.browser.runtime.AgentExecutionRegistry;
+import butvan.cn.agent.chat.SimpleChatAgentFactory;
 import butvan.cn.agent.planner.PlannerAgentFactory;
+import butvan.cn.agent.router.AgentRouterType;
+import butvan.cn.agent.router.AgentTaskRouter;
 import butvan.cn.agent.trace.TokenUsageRegistry;
 import butvan.cn.agent.trace.TokenUsageStates;
 import butvan.cn.agent.trace.TraceContextRegistry;
@@ -36,6 +39,8 @@ public class AgentRunService {
     private final AgentExecutionRegistry agentExecutionRegistry;
     private final TokenUsageRegistry tokenUsageRegistry;
     private final ChatHistoryService chatHistoryService;
+    private final SimpleChatAgentFactory simpleChatAgentFactory;
+    private final AgentTaskRouter agentTaskRouter;
 
     @Value("${memory.session-dir:./memory/sessions}")
     private String memorySessionDir;
@@ -43,14 +48,26 @@ public class AgentRunService {
     public void run(MessageSession session, String conversationId ,String traceId, AgentExecutionHandle handle) {
         String task = session.readMessage();
 
-        traceContextRegistry.setCurrentTraceId(session.getSessionId(), traceId);
-        ReActAgent agent = plannerAgentFactory.create(session,traceId);
+        String safe_session_id = SessionIdSanitizer.requireSafe(session.getSessionId());
+
+        // 新一轮任务开始，清理上一轮 stop 标记
+        traceContextRegistry.clearStopped(safe_session_id);
+
+        traceContextRegistry.setCurrentTraceId(safe_session_id, traceId);
+        // 根据用户输入选择 agent
+        AgentRouterType route_type = agentTaskRouter.route(task);
+        ReActAgent agent;
+        String current_agent_name;
+        if (route_type == AgentRouterType.SIMPLE_CHAT) {
+            agent = simpleChatAgentFactory.create(session);
+            current_agent_name = "SimpleChatAgent";
+        } else {
+            agent = plannerAgentFactory.create(session,traceId);
+            current_agent_name = "PlannerAgent";
+        }
 
         // 保存 planner agent
         handle.setPlannerAgent(agent);
-
-        // 校验 sessionId
-        String safe_session_id = SessionIdSanitizer.requireSafe(session.getSessionId());
 
         // 保存并加载会话记忆
         SessionManager memory_session_manager = SessionManager
@@ -64,6 +81,11 @@ public class AgentRunService {
             AtomicBoolean answer_started = new AtomicBoolean(false);
             // 积累流式回答
             StringBuilder answer_buffer = new StringBuilder();
+
+            // 标记本轮 agent 是否正常拿到了最终结果
+            AtomicBoolean completed_successfully = new AtomicBoolean(false);
+            // 标记 stream 是否发生异常
+            AtomicBoolean stream_failed = new AtomicBoolean(false);
 
             // 配置流失事件类型
             StreamOptions stream_options = StreamOptions.builder()
@@ -106,7 +128,7 @@ public class AgentRunService {
                                 .type(DialogMessageDTO.TYPE_SERVER)
                                 .traceId(traceId)
                                 .eventType("answer_delta")
-                                .agentName("PlannerAgent")
+                                .agentName(current_agent_name)
                                 .trace(false)
                                 .done(false)
                                 .text(text)
@@ -115,6 +137,7 @@ public class AgentRunService {
                     return;
                 }
                 if (type == EventType.AGENT_RESULT) {
+                    completed_successfully.set(true);
                     // 标识agent最终结果
                     String final_text = answer_started.get() ? answer_buffer.toString() : text;
 
@@ -124,7 +147,7 @@ public class AgentRunService {
                             .type(DialogMessageDTO.TYPE_SERVER)
                             .traceId(traceId)
                             .eventType("answer")
-                            .agentName("PlannerAgent")
+                            .agentName(current_agent_name)
                             .trace(false)
                             .done(true)
                             .text(final_text)
@@ -153,7 +176,7 @@ public class AgentRunService {
                                 .type(DialogMessageDTO.TYPE_SERVER)
                                 .traceId(traceId)
                                 .eventType("summary")
-                                .agentName("PlannerAgent")
+                                .agentName(current_agent_name)
                                 .trace(true)
                                 .done(false)
                                 .text(text)
@@ -166,6 +189,7 @@ public class AgentRunService {
                     return;
                 }
             }).doOnError(e -> {
+                stream_failed.set(true);
 
                 if (handle.getStopRequested().get()) {
                     return;
@@ -175,7 +199,7 @@ public class AgentRunService {
                         .type(DialogMessageDTO.TYPE_SERVER)
                         .traceId(traceId)
                         .eventType("error")
-                        .agentName("PlannerAgent")
+                        .agentName(current_agent_name)
                         .trace(true)
                         .done(true)
                         .text("Agent 执行失败：" + e.getMessage())
@@ -194,8 +218,13 @@ public class AgentRunService {
             handle.setStreamDisposable(disposable);
             done_latch.await();
 
-            // agent 执行完成之后，保存 session 状态
-            memory_session_manager.saveSession();
+            // 只在正常完成的时候才保存 agent session
+            if (completed_successfully.get()
+                    && !stream_failed.get()
+                    && !handle.getStopRequested().get()
+            ) {
+                memory_session_manager.saveSession();
+            }
         } catch (InterruptedException e) {
             /**
              * 当前线程被中断，通常来自 future.cancel(true)。
@@ -209,20 +238,19 @@ public class AgentRunService {
                         .type(DialogMessageDTO.TYPE_SERVER)
                         .traceId(traceId)
                         .eventType("error")
-                        .agentName("PlannerAgent")
+                        .agentName(current_agent_name)
                         .trace(true)
                         .done(true)
                         .text("Agent 执行线程被中断：" + e.getMessage())
                         .build());
             }
         } catch (Exception e) {
-            memory_session_manager.saveSession();
             if (!handle.getStopRequested().get()) {
                 session.sendMessage(DialogMessageDTO.builder()
                         .type(DialogMessageDTO.TYPE_SERVER)
                         .traceId(traceId)
                         .eventType("error")
-                        .agentName("PlannerAgent")
+                        .agentName(current_agent_name)
                         .trace(true)
                         .done(true)
                         .text("task execution failed: " + e.getMessage())
@@ -256,7 +284,10 @@ public class AgentRunService {
      */
     public void stop(MessageSession session) {
 
-        String session_id = session.getSessionId();
+        String session_id = SessionIdSanitizer.requireSafe(session.getSessionId());
+
+        // 标记当前 session 已停止
+        traceContextRegistry.markStopped(session_id);
 
         // 获取当前执行句柄
         AgentExecutionHandle handle = agentExecutionRegistry.get(session_id);

@@ -35,26 +35,28 @@ public class    BrowserToolkitFactory {
     }
 
     public BrowserToolkitRuntime createRuntimeForSession(MessageSession session) {
-        // 1. 创建当前 session 的页面会话
-        PageSession pageSession = new PageSession(
+        PageSession page_session = createPageSession(session);
+        Toolkit toolkit = createToolkit(page_session);
+
+        return new BrowserToolkitRuntime(toolkit,page_session);
+    }
+
+    public PageSession createPageSession(MessageSession session) {
+        return new PageSession(
                 playwrightManager,
                 session,
                 pageContentExtractor
         );
+    }
 
-        // 2. 创建浏览器工具对象，工具内部会调用 pageSession
-        BrowserToolkit browserToolkit = new BrowserToolkit(pageSession);
-
-        // 3. 创建 AgentScope Toolkit
+    public Toolkit createToolkit(PageSession session) {
         Toolkit toolkit = new Toolkit();
 
-        // 4. 把 BrowserToolkit 里的 @Tool 方法注册进去
         toolkit.registration()
-                .tool(browserToolkit)
+                .tool(new BrowserToolkit(session))
                 .apply();
 
-        // 5. 同时返回 toolkit 和 pageSession
-        return new BrowserToolkitRuntime(toolkit, pageSession);
+        return toolkit;
     }
 
     public record BrowserToolkitRuntime(

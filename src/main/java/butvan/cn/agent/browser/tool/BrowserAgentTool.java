@@ -1,9 +1,10 @@
 package butvan.cn.agent.browser.tool;
 
-import butvan.cn.agent.browser.BrowserAgentRuntime;
-import butvan.cn.agent.browser.BrowserAgentSessionRegistry;
+import butvan.cn.agent.browser.BrowserAgentFactory;
+import butvan.cn.agent.browser.BrowserPageSessionRegistry;
 import butvan.cn.agent.browser.runtime.AgentExecutionHandle;
 import butvan.cn.agent.browser.runtime.AgentExecutionRegistry;
+import butvan.cn.agent.browser.runtime.PageSession;
 import butvan.cn.websocket.dto.DialogMessageDTO;
 import butvan.cn.websocket.session.MessageSession;
 import io.agentscope.core.ReActAgent;
@@ -15,10 +16,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BrowserAgentTool {
 
-    private final BrowserAgentSessionRegistry browserAgentSessionRegistry;
+    private final BrowserPageSessionRegistry browserPageSessionRegistry;
+    private final BrowserAgentFactory browserAgentFactory;
     private final MessageSession session;
     private final String traceId;
-    // 当前正在运行 agent 注册表
     private final AgentExecutionRegistry agentExecutionRegistry;
 
     @Tool(
@@ -57,17 +58,17 @@ public class BrowserAgentTool {
                 .build());
 
         try {
-            // 根据当前 session 获取当前 agent
-            BrowserAgentRuntime runtime_agent = browserAgentSessionRegistry.getOrCreate(session,traceId);
+
+            // 获取当前 session 对应的 pageSession
+            PageSession page_session = browserPageSessionRegistry.getOrCreate(session);
+            // 每次委派任务都创建一个新的 browserAgent
+            ReActAgent browser_agent = browserAgentFactory.createWithPageSession(session, page_session);
 
             // 把 browser agent runtime 注册到当前执行句柄中
             AgentExecutionHandle handle = agentExecutionRegistry.get(session.getSessionId());
             if (handle != null) {
-                handle.setBrowserAgentRuntime(runtime_agent);
+                handle.setBrowserAgent(browser_agent);
             }
-
-            // 从 runtime 中拿出 agent
-            ReActAgent browser_agent = runtime_agent.agent();
 
             Msg result = browser_agent.call(
                     Msg.builder()
@@ -119,6 +120,11 @@ public class BrowserAgentTool {
             }
 
             return "BrowserAgent 执行失败：" + e.getMessage();
+        } finally {
+            AgentExecutionHandle handle = agentExecutionRegistry.get(session.getSessionId());
+            if (handle != null) {
+                handle.setBrowserAgent(null);
+            }
         }
     }
 

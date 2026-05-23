@@ -4,8 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="feat: 优化前端项目">
+    <list default="true" id="9135b5d6-01a5-4d28-b823-b83bc6216e39" name="更改" comment="feat: update 3d mc">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/BrowserAgentFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/BrowserAgentFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/BrowserToolkitFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/BrowserToolkitFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/runtime/AgentExecutionHandle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/runtime/AgentExecutionHandle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/runtime/AgentExecutionRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/runtime/AgentExecutionRegistry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/runtime/PageContentExtractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/runtime/PageContentExtractor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/tool/BrowserAgentTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/tool/BrowserAgentTool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/tool/BrowserToolkit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/browser/tool/BrowserToolkit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/planner/PlannerAgentFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/planner/PlannerAgentFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/planner/PlannerToolkitFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/planner/PlannerToolkitFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/service/AgentRunService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/service/AgentRunService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/trace/AgentTraceHook.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/trace/AgentTraceHook.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/trace/TraceContextRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/agent/trace/TraceContextRegistry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/butvan/cn/properties/AgentScopeProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/butvan/cn/properties/AgentScopeProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/prompt/promptBrowserSystem.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/prompt/promptBrowserSystem.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/prompt/promptPlanningSystem.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/prompt/promptPlanningSystem.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,7 +49,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/18755120710/Van.git&quot;,
-    &quot;accountId&quot;: &quot;4785d42f-40c8-4162-b38a-aeb68370ccdd&quot;
+    &quot;accountId&quot;: &quot;104054c9-8baa-47d2-9f77-dd18c1df299a&quot;
   }
 }</component>
   <component name="KubernetesApiPersistence">{}</component>
@@ -97,11 +113,19 @@
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
+        <option value="SpringBootApplicationConfigurationType" />
         <option value="js.build_tools.npm" />
       </set>
     </option>
     <option name="configurationStatuses">
       <map>
+        <entry key="SpringBootApplicationConfigurationType">
+          <value>
+            <map>
+              <entry key="AgentApplication" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
         <entry key="js.build_tools.npm">
           <value>
             <map>
@@ -166,6 +190,12 @@
       <workItem from="1779152164177" duration="2376000" />
       <workItem from="1779154550810" duration="19495000" />
       <workItem from="1779192424386" duration="2352000" />
+      <workItem from="1779261964039" duration="5532000" />
+      <workItem from="1779326424823" duration="8190000" />
+      <workItem from="1779439948682" duration="17000" />
+      <workItem from="1779440228975" duration="15000" />
+      <workItem from="1779512748322" duration="5738000" />
+      <workItem from="1779523279070" duration="6648000" />
     </task>
     <task id="LOCAL-00001" summary="-feat: add browser agent">
       <option name="closed" value="true" />
@@ -215,7 +245,31 @@
       <option name="project" value="LOCAL" />
       <updated>1779195558953</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="feat: update client">
+      <option name="closed" value="true" />
+      <created>1779199529272</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1779199529272</updated>
+    </task>
+    <task id="LOCAL-00008" summary="feat: update client">
+      <option name="closed" value="true" />
+      <created>1779326459629</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1779326459629</updated>
+    </task>
+    <task id="LOCAL-00009" summary="feat: update 3d mc">
+      <option name="closed" value="true" />
+      <created>1779329376351</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1779329376351</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -242,6 +296,8 @@
     <MESSAGE value="feat: add README.md file" />
     <MESSAGE value="fix: success PromptConfigServiceImpl" />
     <MESSAGE value="feat: 优化前端项目" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: 优化前端项目" />
+    <MESSAGE value="feat: update client" />
+    <MESSAGE value="feat: update 3d mc" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update 3d mc" />
   </component>
 </project>

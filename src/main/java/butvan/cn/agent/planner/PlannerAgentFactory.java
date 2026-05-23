@@ -61,7 +61,7 @@ public class PlannerAgentFactory {
                 .toolkit(toolkit)
                 .planNotebook(plan_note_book)
                 .hook(new AgentTraceHook(messageSession, traceContextRegistry,tokenUsageRegistry))
-                .maxIters(30)
+                .maxIters(8)
                 .build();
     }
 }

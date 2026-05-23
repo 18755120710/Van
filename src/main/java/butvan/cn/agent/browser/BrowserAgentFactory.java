@@ -1,6 +1,7 @@
 package butvan.cn.agent.browser;
 
 
+import butvan.cn.agent.browser.runtime.PageSession;
 import butvan.cn.agent.prompt.PromptManagement;
 import butvan.cn.agent.trace.AgentTraceHook;
 import butvan.cn.agent.trace.TokenUsageRegistry;
@@ -66,10 +67,34 @@ public class BrowserAgentFactory {
                 .memory(new InMemoryMemory()) // 使用短期记忆
                 .toolkit(toolkitRuntime.toolkit()) // 使用带浏览器工具的 Toolkit
                 .hook(new AgentTraceHook(session,traceContextRegistry,tokenUsageRegistry))
-                .maxIters(agentScopeProperties.getReAct().getMaxIters()) // 最大推理轮数
+                .maxIters(agentScopeProperties.getReAct().getBrowserMaxIters()) // 最大推理轮数
                 .build(); // 完成构造
 
         return new BrowserAgentRuntime(agent, toolkitRuntime.pageSession()); // 返回 agent + pageSession
+    }
+
+    /**
+     * 基于已有的 pageSession 创建一个新的 BrowserAgent
+     * @param messageSession
+     * @param pageSession
+     * @return
+     */
+    public ReActAgent createWithPageSession(MessageSession messageSession, PageSession pageSession) {
+        Toolkit toolkit = browserToolkitFactory.createToolkit(pageSession);
+
+        String sys_prompt = browserSystemPrompt();
+
+        return ReActAgent.builder()
+                .name("BrowserAgent")
+                .sysPrompt(sys_prompt)
+                .model(agentModelProvider.curentModel())
+                .toolkit(toolkit)
+                // 每次新建 BrowserAgent，避免复用旧工具调用历史
+                .memory(new InMemoryMemory())
+                .hook(new AgentTraceHook(messageSession,traceContextRegistry,tokenUsageRegistry))
+                .maxIters(agentScopeProperties.getReAct().getBrowserMaxIters())
+                .build();
+
     }
 
     private String browserSystemPrompt() {

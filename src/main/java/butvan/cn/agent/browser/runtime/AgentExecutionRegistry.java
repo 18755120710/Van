@@ -1,6 +1,7 @@
 package butvan.cn.agent.browser.runtime;
 
 import butvan.cn.agent.browser.BrowserAgentSessionRegistry;
+import butvan.cn.agent.browser.BrowserPageSessionRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,7 @@ public class AgentExecutionRegistry {
     private final Map<String, AgentExecutionHandle> executions = new ConcurrentHashMap<>();
 
     private final BrowserAgentSessionRegistry browserAgentSessionRegistry;
+    private final BrowserPageSessionRegistry browserPageSessionRegistry;
     /**
      * 注册一次新的 agent 执行
      * @param sessionId
@@ -94,24 +96,24 @@ public class AgentExecutionRegistry {
         }
 
         // 请求 BrowserAgent 停止
-        if (handle.getBrowserAgentRuntime() != null) {
+        if (handle.getBrowserAgent() != null) {
             try {
-                handle.getBrowserAgentRuntime().agent().interrupt();
+                handle.getBrowserAgent().interrupt();
             } catch (Exception e) {
                 log.warn("interrupt BrowserAgent failed, sessionId={}", sessionId, e);
             }
+        }
+        // 用户点击停止的时候，关闭当前 session 的浏览器页面状态
+        try {
+            browserPageSessionRegistry.remove(sessionId);
+        } catch (Exception e) {
+            log.warn("close browser pageSession failed, sessionId={}", sessionId, e);
+        }
 
-            try {
-                handle.getBrowserAgentRuntime().close();
-            } catch (Exception e) {
-                log.warn("close BrowserAgentRuntime failed, sessionId={}", sessionId, e);
-            }
-
-            try {
-                browserAgentSessionRegistry.evict(sessionId);
-            } catch (Exception e) {
-                log.warn("remove BrowserAgentRuntime cache failed, sessionId={}", sessionId, e);
-            }
+        try {
+            browserAgentSessionRegistry.evict(sessionId);
+        } catch (Exception e) {
+            log.warn("remove BrowserAgentRuntime cache failed, sessionId={}", sessionId, e);
         }
 
         // 停止 Reactor stream 继续推送事件
