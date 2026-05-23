@@ -565,27 +565,34 @@ export const createFloor = () => {
   floorMesh.receiveShadow = true
   root.add(floorMesh)
 
-  // 1. 周围纯白矮墙设计 (Half-wall, 高 1.5 米)，具有精致厚度，杜绝阻挡俯瞰视野，具有完美的微缩沙盘感
+  // 1. 周围纯白矮墙设计 (Half-wall, 提拔至高度 1.75 米)，带灰色顶盖收边条，完美暴露出墙体厚度与合围空间
   const wallColor = 0xffffff
+  const capColor = 0xd4d4d8 // 优雅的冷灰色收边顶盖板
 
-  // 1.1 后侧矮背景墙 (Z = -3.8)
-  const backWall = addBox(root, 9.2, 1.5, 0.06, wallColor, [0, 0.75, -3.8], { roughness: 0.95 })
-  backWall.castShadow = false // 禁用阴影投射，保持大平地纯白
+  // 1.1 后侧矮背景墙 (Z = -3.8, 高 1.75, 厚 0.06)
+  const backWall = addBox(root, 9.2, 1.75, 0.06, wallColor, [0, 0.875, -3.8], { roughness: 0.95 })
+  backWall.castShadow = false // 禁用阴影，保持大平地洁净
   backWall.receiveShadow = true
+  // 后墙顶部冷灰色盖板 (突出墙面 0.02 宽表现精致厚度)
+  const backCap = addBox(root, 9.22, 0.02, 0.08, capColor, [0, 1.76, -3.8])
+  backCap.castShadow = false
 
-  // 1.2 左侧矮背景墙 (X = -4.6)
-  const leftWall = addBox(root, 0.06, 1.5, 7.6, wallColor, [-4.6, 0.75, 0], { roughness: 0.95 })
-  leftWall.castShadow = false // 禁用阴影投射
+  // 1.2 左侧矮背景墙 (内缩至 X = -3.7 处，完美贴合生活区边缘防道具遮挡，高 1.75, 厚 0.06)
+  const leftWall = addBox(root, 0.06, 1.75, 7.6, wallColor, [-3.7, 0.875, 0], { roughness: 0.95 })
+  leftWall.castShadow = false // 禁用阴影
   leftWall.receiveShadow = true
+  // 左墙顶部冷灰色盖板
+  const leftCap = addBox(root, 0.08, 0.02, 7.62, capColor, [-3.7, 1.76, 0])
+  leftCap.castShadow = false
 
   // ---------------------------------------------------------------------------
-  // 2. 在后侧矮墙上集成极致精美的【半透明幽蓝色科技玻璃大门】(X = 1.8)
+  // 2. 在后侧矮墙上集成极致精美的【半透明幽蓝色科技玻璃大门】(X = 1.8, 高度 1.5 米隐于墙下)
   // ---------------------------------------------------------------------------
   const frameColor = 0xa1a1aa  // 银灰色高级极细钢架
   const glassColor = 0xbae6fd  // 半透明清亮幽蓝色玻璃
   const handleColor = 0xf4f4f5 // 亮银色拉丝不锈钢把手
 
-  // 2.1 极细钢制门框 (高 1.5，刚好与矮墙平齐，完美隐藏边缘)
+  // 2.1 极细钢制门框 (高度 1.5 米，顶部留有 0.25 米墙梁，极其符合建筑工程美学)
   const frameL = addBox(root, 0.03, 1.5, 0.04, frameColor, [1.8 - 0.42, 0.75, -3.76])
   const frameR = addBox(root, 0.03, 1.5, 0.04, frameColor, [1.8 + 0.42, 0.75, -3.76])
   const frameT = addBox(root, 0.87, 0.03, 0.04, frameColor, [1.8, 1.5, -3.76])
@@ -600,7 +607,7 @@ export const createFloor = () => {
     roughness: 0.1,
     metalness: 0.8
   })
-  doorPanel.castShadow = false // 门板不设置阴影，极其明透
+  doorPanel.castShadow = false // 门板不投射阴影，极其干净
   doorPanel.receiveShadow = true
 
   // 2.3 极致精致的亮银色圆润大门执手
