@@ -1918,6 +1918,37 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
 }
 
+.right-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.copy-all-btn {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.copy-all-btn:hover {
+  background: var(--bg-active);
+  border-color: var(--border-medium);
+  color: var(--text-primary);
+}
+
+.copy-all-btn svg {
+  flex-shrink: 0;
+}
+
 .right-panel-content {
   flex: 1;
   overflow-y: auto;

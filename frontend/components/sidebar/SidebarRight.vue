@@ -22,12 +22,30 @@
           ({{ activeTraceMsg.toolResults.length }})
         </span>
       </div>
-      <button class="close-right-panel-btn" @click="isRightPanelOpen = false" title="关闭面板" type="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
+      <div class="right-panel-actions">
+        <button 
+          v-if="activeTraceMsg && activeTraceMsg.toolResults && activeTraceMsg.toolResults.length > 0"
+          class="copy-all-btn" 
+          @click="copyAllLink" 
+          :title="copiedAll ? '已复制完整链路' : '复制完整执行链路'"
+          type="button"
+        >
+          <svg v-if="copiedAll" style="color: #34d399" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          <span>{{ copiedAll ? '已复制' : '复制完整链路' }}</span>
+        </button>
+        <button class="close-right-panel-btn" @click="isRightPanelOpen = false" title="关闭面板" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <!-- Segment Switcher Tab -->
@@ -208,6 +226,7 @@ import MinecraftSandbox from '~/components/sandbox/MinecraftSandbox.vue'
 
 const rightPanelContent = ref<HTMLElement | null>(null)
 const copiedIndex = ref<number | null>(null)
+const copiedAll = ref(false)
 const activeFilter = ref<'all' | 'plan' | 'tool' | 'error'>('all')
 const rightPanelWidth = ref(520)
 const isResizingRightPanel = ref(false)
@@ -323,6 +342,39 @@ const copyText = async (text: string, index: number) => {
     }, 1500)
   } catch (err) {
     console.error('Failed to copy step trace payload:', err)
+  }
+}
+
+const copyAllLink = async () => {
+  if (!activeTraceMsg.value || !activeTraceMsg.value.toolResults) return
+  
+  const textList = activeTraceMsg.value.toolResults.map((tool, idx) => {
+    const timeStr = tool.timestamp ? `[${tool.timestamp}] ` : ''
+    const typeStr = getEventTypeName(tool.eventType)
+    const agentStr = tool.agentName ? `Agent: ${tool.agentName}` : ''
+    const toolStr = tool.toolName ? `Tool: ${tool.toolName}` : ''
+    const metaInfo = [agentStr, toolStr].filter(Boolean).join(' | ')
+    
+    let content = `### ${idx + 1}. ${timeStr}${typeStr}`
+    if (metaInfo) {
+      content += ` (${metaInfo})`
+    }
+    if (tool.text) {
+      content += `\n\`\`\`\n${tool.text}\n\`\`\``
+    }
+    return content
+  })
+  
+  const fullText = textList.join('\n\n')
+  
+  try {
+    await navigator.clipboard.writeText(fullText)
+    copiedAll.value = true
+    setTimeout(() => {
+      copiedAll.value = false
+    }, 1500)
+  } catch (err) {
+    console.error('Failed to copy all step trace payload:', err)
   }
 }
 
