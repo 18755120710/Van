@@ -22,6 +22,7 @@ type Mat = THREE.MeshStandardMaterial
 
 const materialCache = new Map<string, Mat>()
 
+// 创建并缓存高质感哑光材质，开启温和的光泽度和漫反射
 export const createMaterial = (
   color: number,
   options: {
@@ -29,9 +30,11 @@ export const createMaterial = (
     emissiveIntensity?: number
     roughness?: number
     metalness?: number
+    opacity?: number
+    transparent?: boolean
   } = {}
 ) => {
-  const key = `${color}-${options.emissive || 0}-${options.emissiveIntensity || 0}-${options.roughness || 0.82}-${options.metalness || 0}`
+  const key = `${color}-${options.emissive || 0}-${options.emissiveIntensity || 0}-${options.roughness || 0.45}-${options.metalness || 0.1}-${options.opacity || 1}-${options.transparent || false}`
   const cached = materialCache.get(key)
   if (cached) return cached
 
@@ -39,13 +42,16 @@ export const createMaterial = (
     color,
     emissive: options.emissive || 0x000000,
     emissiveIntensity: options.emissiveIntensity || 0,
-    roughness: options.roughness ?? 0.82,
-    metalness: options.metalness ?? 0
+    roughness: options.roughness ?? 0.45,
+    metalness: options.metalness ?? 0.1,
+    opacity: options.opacity ?? 1.0,
+    transparent: options.transparent ?? false
   })
   materialCache.set(key, mat)
   return mat
 }
 
+// 快速创建长方体
 const box = (
   width: number,
   height: number,
@@ -64,6 +70,7 @@ const box = (
   return mesh
 }
 
+// 快速向组中添加长方体
 const addBox = (
   group: THREE.Group,
   width: number,
@@ -78,6 +85,7 @@ const addBox = (
   return mesh
 }
 
+// 高保真精致色彩调色盘，完美契合系统主体的高级视觉风格
 const palette: Record<SandboxRole, {
   hair: number
   shirt: number
@@ -87,85 +95,155 @@ const palette: Record<SandboxRole, {
   accessory: number
 }> = {
   pm: {
-    hair: 0x4b2a13,
-    shirt: 0xf7f4eb,
-    trim: 0x1e5c97,
-    pants: 0x25272b,
-    shoes: 0x56361d,
-    accessory: 0x1e5c97
+    hair: 0x3f2f25,      // 深棕发色
+    shirt: 0xf8fafc,     // 纯白高档衬衫
+    trim: 0x1e3a8a,      // 藏蓝色西装坎肩
+    pants: 0x334155,     // 商务深灰西裤
+    shoes: 0x451a03,     // 皮鞋棕
+    accessory: 0x2563eb  // 吊绳宝蓝色
   },
   planner: {
-    hair: 0x2e1b0e,
-    shirt: 0x163d63,
-    trim: 0xe8c37a,
-    pants: 0x191b20,
-    shoes: 0x101114,
-    accessory: 0x2d6fa3
+    hair: 0x1e1b4b,      // 极客蓝黑发色
+    shirt: 0xe2e8f0,     // 现代浅灰卫衣
+    trim: 0x2563eb,      // 科技感蓝色拼线
+    pants: 0x1e293b,     // 深黑蓝牛仔裤
+    shoes: 0x0f172a,     // 暗色潮鞋
+    accessory: 0xeab308  // 暖金色吊绳
   },
   browser: {
-    hair: 0x2c1b10,
-    shirt: 0x17191d,
-    trim: 0xeff3f4,
-    pants: 0x2e5676,
-    shoes: 0xd9dee2,
-    accessory: 0x64b8c7
+    hair: 0x7c2d12,      // 动感红棕发色
+    shirt: 0x0f172a,     // 极简曜石黑外套
+    trim: 0x38bdf8,      // 天蓝色亮边
+    pants: 0x475569,     // 休闲灰长裤
+    shoes: 0xe2e8f0,     // 纯白板鞋
+    accessory: 0x06b6d4  // 极客青吊绳
   },
   qa: {
-    hair: 0x4d2a12,
-    shirt: 0xe7bd31,
-    trim: 0x1e5c97,
-    pants: 0x214a68,
-    shoes: 0xf1f1e9,
-    accessory: 0x1e5c97
+    hair: 0x78350f,      // 温暖琥珀褐发色
+    shirt: 0xfef08a,     // 精致淡黄休闲衫
+    trim: 0xeab308,      // 芒果黄饰边
+    pants: 0x374151,     // 深灰色哈伦裤
+    shoes: 0xf8fafc,     // 纯白运动鞋
+    accessory: 0xdb2777  // 玫红色吊绳
   },
   ops: {
-    hair: 0x151515,
-    shirt: 0x121418,
-    trim: 0x24394f,
-    pants: 0x242629,
-    shoes: 0x0e0f11,
-    accessory: 0x2b7dbd
+    hair: 0x18181b,      // 纯粹黑发色
+    shirt: 0x27272a,     // 质感炭黑极客衫
+    trim: 0x10b981,      // 翠绿色极客线条
+    pants: 0x18181b,     // 漆黑长裤
+    shoes: 0x3f3f46,     // 运动灰鞋
+    accessory: 0x10b981  // 极客绿吊绳
   }
 }
 
+// ---------------------------------------------------------------------------
+// 1. 精致方块人 (Voxel Characters) 引擎构建
+// ---------------------------------------------------------------------------
 export const createMinecraftCharacter = (role: SandboxRole): RoleRig => {
   const colors = palette[role]
   const root = new THREE.Group()
   const head = new THREE.Group()
-
+  
+  const skin = 0xfdba74 // 饱满高贵的健康肤色
+  
+  // 1.1 精致身体 & 领口细节
   addBox(root, 0.36, 0.58, 0.18, colors.shirt, [0, 0.92, 0])
-  addBox(root, 0.38, 0.12, 0.2, colors.trim, [0, 1.15, -0.01])
+  // 领口和西装马甲/肩饰
+  addBox(root, 0.38, 0.14, 0.2, colors.trim, [0, 1.14, 0])
 
-  const skin = 0xf2c083
-  const leftArm = addBox(root, 0.13, 0.52, 0.15, colors.shirt, [-0.29, 0.9, 0])
-  const rightArm = addBox(root, 0.13, 0.52, 0.15, colors.shirt, [0.29, 0.9, 0])
-  addBox(root, 0.14, 0.14, 0.16, skin, [-0.29, 0.58, 0])
-  addBox(root, 0.14, 0.14, 0.16, skin, [0.29, 0.58, 0])
-
-  const leftLeg = addBox(root, 0.16, 0.48, 0.16, colors.pants, [-0.1, 0.34, 0])
-  const rightLeg = addBox(root, 0.16, 0.48, 0.16, colors.pants, [0.1, 0.34, 0])
-  addBox(root, 0.17, 0.1, 0.2, colors.shoes, [-0.1, 0.07, 0.02])
-  addBox(root, 0.17, 0.1, 0.2, colors.shoes, [0.1, 0.07, 0.02])
-
-  addBox(head, 0.44, 0.44, 0.44, skin, [0, 1.42, 0])
-  addBox(head, 0.46, 0.18, 0.46, colors.hair, [0, 1.62, -0.02])
-  addBox(head, 0.48, 0.14, 0.18, colors.hair, [0, 1.5, -0.22])
-  addBox(head, 0.08, 0.08, 0.03, 0x1f2933, [-0.1, 1.43, -0.235])
-  addBox(head, 0.08, 0.08, 0.03, 0x1f2933, [0.1, 1.43, -0.235])
-
-  if (role === 'planner') {
-    addBox(head, 0.38, 0.08, 0.035, 0x111827, [0, 1.45, -0.245])
+  // PM 特属：胸前白衬衫V字领口及小领结，立竿见影的干练感
+  if (role === 'pm') {
+    addBox(root, 0.1, 0.15, 0.21, 0xffffff, [0, 1.1, 0.005]) // V领衬衫
+    addBox(root, 0.12, 0.05, 0.22, 0xd97706, [0, 1.15, 0.01]) // 橘红色小领结
   }
 
+  // 1.2 左右手臂与精致手掌体素
+  const leftArm = addBox(root, 0.12, 0.52, 0.14, colors.shirt, [-0.28, 0.9, 0])
+  const rightArm = addBox(root, 0.12, 0.52, 0.14, colors.shirt, [0.28, 0.9, 0])
+  // 裸露的精致手腕/手掌拼色块
+  addBox(root, 0.13, 0.12, 0.15, skin, [-0.28, 0.58, 0])
+  addBox(root, 0.13, 0.12, 0.15, skin, [0.28, 0.58, 0])
+
+  // 1.3 左右长裤与精致拼色鞋子
+  addBox(root, 0.15, 0.48, 0.15, colors.pants, [-0.09, 0.34, 0])
+  addBox(root, 0.15, 0.48, 0.15, colors.pants, [0.09, 0.34, 0])
+  // 精致拼接鞋底和鞋身
+  const leftLeg = addBox(root, 0.16, 0.1, 0.18, colors.shoes, [-0.09, 0.07, 0.01])
+  const rightLeg = addBox(root, 0.16, 0.1, 0.18, colors.shoes, [0.09, 0.07, 0.01])
+
+  // 1.4 精致立体头部及多层立体刘海/发型
+  addBox(head, 0.42, 0.42, 0.42, skin, [0, 1.42, 0]) // 头部核心
+  
+  // 基底发型
+  addBox(head, 0.44, 0.16, 0.44, colors.hair, [0, 1.61, -0.01]) // 顶部头发
+  addBox(head, 0.46, 0.14, 0.2, colors.hair, [0, 1.5, -0.19])   // 额前主刘海
+  addBox(head, 0.44, 0.28, 0.2, colors.hair, [0, 1.44, 0.18])   // 脑后勺长发
+  
+  // 立体刘海微方块微调 (多层拼接表现精致感)
+  addBox(head, 0.1, 0.08, 0.22, colors.hair, [-0.12, 1.52, -0.19])
+  addBox(head, 0.08, 0.08, 0.22, colors.hair, [0.12, 1.52, -0.19])
+  
+  // 精致眼睛体素（白睛 + 虹膜复合构造）
+  addBox(head, 0.08, 0.08, 0.02, 0xffffff, [-0.1, 1.42, -0.215]) // 左白睛
+  addBox(head, 0.08, 0.08, 0.02, 0xffffff, [0.1, 1.42, -0.215])  // 右白睛
+  addBox(head, 0.04, 0.08, 0.025, 0x1f2937, [-0.08, 1.42, -0.218]) // 左虹膜
+  addBox(head, 0.04, 0.08, 0.025, 0x1f2937, [0.08, 1.42, -0.218])  // 右虹膜
+
+  // 1.5 角色专属极客立体配饰
+  
+  // Planner 的立体圆黑框镜架 + 极客幽蓝自发光耳麦
+  if (role === 'planner') {
+    // 黑镜架
+    addBox(head, 0.13, 0.13, 0.03, 0x0f172a, [-0.1, 1.42, -0.222]) // 左框
+    addBox(head, 0.13, 0.13, 0.03, 0x0f172a, [0.1, 1.42, -0.222])  // 右框
+    addBox(head, 0.08, 0.03, 0.02, 0x0f172a, [0, 1.44, -0.222])   // 鼻梁梁
+    addBox(head, 0.02, 0.02, 0.24, 0x0f172a, [-0.22, 1.44, -0.11]) // 左镜腿
+    addBox(head, 0.02, 0.02, 0.24, 0x0f172a, [0.22, 1.44, -0.11])  // 右镜腿
+    
+    // 自发光耳麦
+    addBox(head, 0.05, 0.08, 0.08, 0x0ea5e9, [0.22, 1.4, 0.02], { emissive: 0x38bdf8, emissiveIntensity: 0.8 })
+    addBox(head, 0.02, 0.02, 0.12, 0x0ea5e9, [0.22, 1.36, -0.06], { emissive: 0x38bdf8, emissiveIntensity: 0.5 })
+  }
+
+  // Browser 的天蓝色立体运动式挂耳式大耳机
+  if (role === 'browser') {
+    addBox(head, 0.05, 0.16, 0.13, 0x0284c7, [-0.22, 1.4, 0])  // 左耳罩
+    addBox(head, 0.05, 0.16, 0.13, 0x0284c7, [0.22, 1.4, 0])   // 右耳罩
+    addBox(head, 0.44, 0.03, 0.08, 0x0284c7, [0, 1.63, 0])    // 头戴大横梁
+    // 侧边炫酷蓝光装饰带
+    addBox(head, 0.052, 0.04, 0.04, 0x38bdf8, [-0.22, 1.4, 0], { emissive: 0x38bdf8, emissiveIntensity: 0.9 })
+    addBox(head, 0.052, 0.04, 0.04, 0x38bdf8, [0.22, 1.4, 0], { emissive: 0x38bdf8, emissiveIntensity: 0.9 })
+  }
+
+  // QA 的精致黄橙拼色立体棒球帽
   if (role === 'qa') {
-    addBox(head, 0.18, 0.06, 0.46, 0xe7bd31, [0.18, 1.63, -0.02])
+    addBox(head, 0.44, 0.14, 0.44, 0xeab308, [0, 1.63, 0]) // 帽冠
+    // 斜戴的帽舌 (通过 X 轴或 Z 轴错落拼装表现斜着戴的街头感)
+    addBox(head, 0.38, 0.02, 0.18, 0xeab308, [-0.08, 1.58, -0.24]) // 斜出的帽沿
+    addBox(head, 0.08, 0.08, 0.02, 0x475569, [-0.08, 1.65, -0.225]) // 帽子前面的小徽章体素
+  }
+
+  // Ops 的发光翠绿赛博护目镜
+  if (role === 'ops') {
+    addBox(head, 0.38, 0.12, 0.04, 0x10b981, [0, 1.43, -0.215], {
+      emissive: 0x10b981,
+      emissiveIntensity: 0.72,
+      transparent: true,
+      opacity: 0.88
+    })
+    addBox(head, 0.02, 0.06, 0.22, 0x27272a, [-0.2, 1.43, -0.09]) // 左框架
+    addBox(head, 0.02, 0.06, 0.22, 0x27272a, [0.2, 1.43, -0.09])  // 右框架
   }
 
   root.add(head)
 
-  const badge = addBox(root, 0.1, 0.14, 0.025, 0xf4f7f8, [0.11, 1.02, -0.105])
-  addBox(root, 0.025, 0.23, 0.02, colors.accessory, [0.06, 1.12, -0.115])
-  addBox(root, 0.025, 0.23, 0.02, colors.accessory, [0.16, 1.12, -0.115])
+  // 1.6 全员挂载的 3D 立体小工牌 (带吊绳结构)
+  const badge = addBox(root, 0.11, 0.15, 0.03, 0xffffff, [0.1, 1.0, -0.105]) // 证件板
+  addBox(root, 0.02, 0.24, 0.02, colors.accessory, [0.05, 1.11, -0.11])    // 左挂绳
+  addBox(root, 0.02, 0.24, 0.02, colors.accessory, [0.15, 1.11, -0.11])    // 右挂绳
+  // 工牌内部贴纸细节 (深色头像贴图及红印)
+  addBox(root, 0.05, 0.06, 0.035, 0x475569, [0.07, 1.03, -0.11])
+  addBox(root, 0.06, 0.015, 0.035, 0x10b981, [0.11, 0.94, -0.11]) // 绿点状态灯
 
   return {
     role,
@@ -179,31 +257,54 @@ export const createMinecraftCharacter = (role: SandboxRole): RoleRig => {
   }
 }
 
+// ---------------------------------------------------------------------------
+// 2. 现代极简纯白办公工作台构建 (Workstation)
+// ---------------------------------------------------------------------------
 export const createWorkstation = (role: SandboxRole, accent: number) => {
   const root = new THREE.Group()
   const screens: THREE.Mesh[] = []
 
-  addBox(root, 1.55, 0.14, 0.88, 0xc88c42, [0, 0.6, 0])
-  addBox(root, 0.12, 0.6, 0.12, 0x7b542c, [-0.65, 0.28, -0.32])
-  addBox(root, 0.12, 0.6, 0.12, 0x7b542c, [0.65, 0.28, -0.32])
-  addBox(root, 0.12, 0.6, 0.12, 0x7b542c, [-0.65, 0.28, 0.32])
-  addBox(root, 0.12, 0.6, 0.12, 0x7b542c, [0.65, 0.28, 0.32])
+  // 2.1 纯白色高反射桌面 (哑光高质感白漆)
+  addBox(root, 1.6, 0.06, 0.9, 0xffffff, [0, 0.6, 0], { roughness: 0.15, metalness: 0.05 })
+  
+  // 2.2 浅灰色纤细圆润桌腿 (4个角)
+  const legColor = 0xd4d4d8
+  addBox(root, 0.06, 0.6, 0.06, legColor, [-0.72, 0.27, -0.37])
+  addBox(root, 0.06, 0.6, 0.06, legColor, [0.72, 0.27, -0.37])
+  addBox(root, 0.06, 0.6, 0.06, legColor, [-0.72, 0.27, 0.37])
+  addBox(root, 0.06, 0.6, 0.06, legColor, [0.72, 0.27, 0.37])
 
+  // 2.3 极致窄边框超薄现代显示器 (Browser 为双屏联动，其余为单屏)
   const screenCount = role === 'browser' ? 2 : 1
   for (let i = 0; i < screenCount; i += 1) {
-    const offsetX = screenCount === 2 ? (i === 0 ? -0.24 : 0.24) : 0
-    addBox(root, 0.46, 0.08, 0.08, 0x2a2f35, [offsetX, 0.73, -0.24])
-    const screen = addBox(root, 0.46, 0.32, 0.04, 0x111820, [offsetX, 0.93, -0.32], {
+    const offsetX = screenCount === 2 ? (i === 0 ? -0.26 : 0.26) : 0
+    
+    // 超薄背板支架
+    addBox(root, 0.08, 0.22, 0.08, 0x18181b, [offsetX, 0.72, -0.26]) // 纤细立柱
+    addBox(root, 0.2, 0.02, 0.2, 0xd4d4d8, [offsetX, 0.63, -0.26])   // 银色底座
+    
+    // 黑色大屏幕背板
+    addBox(root, 0.54, 0.34, 0.03, 0x18181b, [offsetX, 0.88, -0.28])
+    
+    // 自发光超窄液晶屏幕面板 (Active状态时具有脉冲亮屏特效)
+    const screen = addBox(root, 0.52, 0.32, 0.015, 0x181820, [offsetX, 0.88, -0.27], {
       emissive: accent,
-      emissiveIntensity: 0.25
+      emissiveIntensity: 0.35,
+      roughness: 0.1
     })
     screens.push(screen)
-    addBox(root, 0.34, 0.03, 0.05, 0x2a2f35, [offsetX, 0.74, -0.31])
+    
+    // 键盘和触控板体素
+    addBox(root, 0.36, 0.015, 0.14, 0xf4f4f5, [offsetX, 0.635, 0.08]) // 纯白极简键盘
+    addBox(root, 0.06, 0.015, 0.08, 0xffffff, [offsetX + 0.24, 0.635, 0.08], { roughness: 0.1 }) // 鼠标
   }
 
-  addBox(root, 0.58, 0.04, 0.2, 0x24282e, [0, 0.7, 0.08])
-  addBox(root, 0.16, 0.05, 0.12, 0x2f3338, [0.45, 0.7, 0.08])
-  addBox(root, 0.12, 0.14, 0.12, 0xf7f2e3, [-0.5, 0.73, 0.14])
+  // 2.4 桌角点缀细节：一杯温热的奶茶 / 咖啡杯
+  addBox(root, 0.08, 0.12, 0.08, 0xd7ccc8, [-0.55, 0.68, 0.2])  // 纸杯身
+  addBox(root, 0.09, 0.02, 0.09, 0x3e2723, [-0.55, 0.74, 0.2])  // 深色盖子
+
+  // 桌角白色 Mac Studio 主机
+  addBox(root, 0.16, 0.09, 0.16, 0xf4f4f5, [0.55, 0.66, 0.22])
 
   return {
     role,
@@ -212,77 +313,263 @@ export const createWorkstation = (role: SandboxRole, accent: number) => {
   } satisfies WorkstationRig
 }
 
+// ---------------------------------------------------------------------------
+// 3. 曜石黑人体工学电脑转椅构建 (Office Chair)
+// ---------------------------------------------------------------------------
 export const createOfficeChair = () => {
   const root = new THREE.Group()
-  addBox(root, 0.5, 0.12, 0.48, 0x202225, [0, 0.36, 0])
-  addBox(root, 0.48, 0.56, 0.12, 0x202225, [0, 0.72, 0.2])
-  addBox(root, 0.1, 0.42, 0.1, 0x121315, [0, 0.16, 0])
-  addBox(root, 0.76, 0.08, 0.1, 0x121315, [0, 0.05, 0])
-  addBox(root, 0.1, 0.08, 0.76, 0x121315, [0, 0.05, 0])
+  
+  const chairColor = 0x27272a // 深炭灰曜石黑
+  
+  // 3.1 极简厚实坐垫 (带前侧微斜角切面)
+  addBox(root, 0.48, 0.08, 0.46, chairColor, [0, 0.38, 0])
+  
+  // 3.2 护脊工学悬浮式靠背
+  addBox(root, 0.44, 0.48, 0.08, chairColor, [0, 0.68, 0.18])
+  
+  // 3.3 银色气压杆支撑杆 & 五星爪轮底座
+  addBox(root, 0.06, 0.32, 0.06, 0xa1a1aa, [0, 0.18, 0]) // 银色钢质中轴
+  
+  // 十字/五星爪底座 (扁平金属杆拼接)
+  addBox(root, 0.64, 0.03, 0.06, 0x52525b, [0, 0.04, 0])
+  addBox(root, 0.06, 0.03, 0.64, 0x52525b, [0, 0.04, 0])
+  
+  // 底部极微小的尼龙静音轮体素
+  addBox(root, 0.04, 0.04, 0.04, 0x18181b, [-0.29, 0.01, 0])
+  addBox(root, 0.04, 0.04, 0.04, 0x18181b, [0.29, 0.01, 0])
+  addBox(root, 0.04, 0.04, 0.04, 0x18181b, [0, 0.01, -0.29])
+  addBox(root, 0.04, 0.04, 0.04, 0x18181b, [0, 0.01, 0.29])
+
   return root
 }
 
+// ---------------------------------------------------------------------------
+// 4. 极致现代咖啡吧台区 (Coffee Station)
+// ---------------------------------------------------------------------------
+export const createCoffeeStation = () => {
+  const root = new THREE.Group()
+  
+  const marbleColor = 0xf8fafc // 极浅冷大理石白
+  
+  // 4.1 L型精细拼接现代吧台
+  // 主台面
+  addBox(root, 1.8, 0.9, 0.6, marbleColor, [0, 0.45, 0])
+  // 转角台面，完美拼合呈优雅L型
+  addBox(root, 0.6, 0.9, 1.0, marbleColor, [-0.6, 0.45, 0.8])
+  
+  // 吧台底部的拉丝黑色金属踢脚线
+  addBox(root, 1.81, 0.08, 0.61, 0x27272a, [0, 0.04, 0])
+  addBox(root, 0.61, 0.08, 1.01, 0x27272a, [-0.6, 0.04, 0.8])
+
+  // 4.2 意式重工业不锈钢咖啡机 (Coffee Machine)
+  const metalColor = 0xe4e4e7
+  const machine = new THREE.Group()
+  machine.position.set(0.4, 0.9, 0.05)
+  
+  addBox(machine, 0.48, 0.38, 0.34, metalColor, [0, 0.19, 0], { roughness: 0.1, metalness: 0.8 }) // 机身
+  addBox(machine, 0.44, 0.08, 0.28, 0x27272a, [0, 0.04, 0.02])                                  // 接水槽
+  // 不锈钢双咖啡萃取头
+  addBox(machine, 0.05, 0.1, 0.05, 0x18181b, [-0.1, 0.08, -0.14])
+  addBox(machine, 0.05, 0.1, 0.05, 0x18181b, [0.1, 0.08, -0.14])
+  // 金属小蒸汽棒
+  addBox(machine, 0.02, 0.16, 0.02, 0xa1a1aa, [0.18, 0.12, -0.14], { roughness: 0.05, metalness: 0.9 })
+  // 顶部自发光微小发光按钮 (细节拉满)
+  addBox(machine, 0.03, 0.03, 0.03, 0x10b981, [-0.12, 0.32, -0.16], { emissive: 0x10b981, emissiveIntensity: 0.7 })
+  addBox(machine, 0.03, 0.03, 0.03, 0xef4444, [-0.04, 0.32, -0.16], { emissive: 0xef4444, emissiveIntensity: 0.4 })
+  
+  root.add(machine)
+
+  // 4.3 吧台上整齐陈列的纸杯两列 (Coffee Cups)
+  const cupPlacements: [number, number, number][] = [
+    [-0.3, 0.9, 0.05], [-0.15, 0.9, 0.05], [0, 0.9, 0.05],
+    [-0.3, 0.9, -0.08], [-0.15, 0.9, -0.08], [0, 0.9, -0.08],
+    [-0.6, 0.9, 0.5], [-0.6, 0.9, 0.65], [-0.6, 0.9, 0.8]
+  ]
+  cupPlacements.forEach((pos, idx) => {
+    const cup = new THREE.Group()
+    cup.position.set(...pos)
+    
+    // 牛皮纸色杯身
+    addBox(cup, 0.08, 0.11, 0.08, 0xd7ccc8, [0, 0.055, 0])
+    // 巧克力色杯盖
+    addBox(cup, 0.09, 0.02, 0.09, 0x3e2723, [0, 0.11, 0])
+    
+    // 纸杯外面环绕套环细节
+    addBox(cup, 0.084, 0.04, 0.084, 0x8d6e63, [0, 0.055, 0])
+    
+    root.add(cup)
+  })
+
+  return root
+}
+
+// ---------------------------------------------------------------------------
+// 5. 极致极简家用跑步机构建 (Treadmill)
+// ---------------------------------------------------------------------------
+export const createTreadmill = () => {
+  const root = new THREE.Group()
+  
+  const whiteFrame = 0xf8fafc // 高级哑光白色
+  
+  // 5.1 跑带底盘边框
+  addBox(root, 0.82, 0.08, 1.55, whiteFrame, [0, 0.04, 0])
+  // 灰黑塑胶大跑带面
+  addBox(root, 0.64, 0.015, 1.36, 0x3f3f46, [0, 0.08, 0], { roughness: 0.8 })
+  
+  // 5.2 扶手与前倾控制面板
+  addBox(root, 0.05, 0.85, 0.05, whiteFrame, [-0.36, 0.46, -0.6]) // 左侧立柱
+  addBox(root, 0.05, 0.85, 0.05, whiteFrame, [0.36, 0.46, -0.6])  // 右侧立柱
+  
+  // 黑色横板控制台
+  addBox(root, 0.78, 0.06, 0.16, 0x18181b, [0, 0.88, -0.6])
+  // 自发光绿色/红色微型按键 (启动/停止)
+  addBox(root, 0.04, 0.01, 0.04, 0x10b981, [-0.15, 0.915, -0.6], { emissive: 0x10b981, emissiveIntensity: 0.8 })
+  addBox(root, 0.04, 0.01, 0.04, 0xef4444, [0.15, 0.915, -0.6], { emissive: 0xef4444, emissiveIntensity: 0.8 })
+  
+  // 左右黑色软胶小扶手
+  addBox(root, 0.04, 0.04, 0.38, 0x18181b, [-0.36, 0.86, -0.42])
+  addBox(root, 0.04, 0.04, 0.38, 0x18181b, [0.36, 0.86, -0.42])
+
+  return root
+}
+
+// ---------------------------------------------------------------------------
+// 6. 极简洗手间角落与圆润智能马桶构建 (Restroom Corner)
+// ---------------------------------------------------------------------------
+export const createRestroom = () => {
+  const root = new THREE.Group()
+  
+  const whiteCeramic = 0xffffff // 陶瓷纯亮白
+  
+  // 6.1 智能马桶组 (Toilet)
+  const toilet = new THREE.Group()
+  toilet.position.set(0, 0, 0.05)
+  
+  // 陶瓷主身 (圆润底座)
+  addBox(toilet, 0.38, 0.36, 0.52, whiteCeramic, [0, 0.18, -0.05], { roughness: 0.1 })
+  
+  // 智能马桶盖垫圈圈 (分层立体化)
+  addBox(toilet, 0.36, 0.03, 0.48, whiteCeramic, [0, 0.38, -0.05], { roughness: 0.1 })
+  
+  // 微微半掀开的扁平马桶盖板 (微倾的体素组合)
+  addBox(toilet, 0.36, 0.38, 0.03, whiteCeramic, [0, 0.56, 0.16], { roughness: 0.1 })
+  
+  // 后侧方形储水箱 (智能控制背板)
+  addBox(toilet, 0.38, 0.52, 0.16, whiteCeramic, [0, 0.62, 0.22], { roughness: 0.1 })
+  // 蓝色发光智能侧面板 (细节彩蛋)
+  addBox(toilet, 0.02, 0.06, 0.1, 0x3b82f6, [0.192, 0.74, 0.22], { emissive: 0x3b82f6, emissiveIntensity: 0.7 })
+
+  root.add(toilet)
+
+  // 6.2 墙壁悬挂式迷你卷纸架 (Toilet Paper Roll)
+  const roll = new THREE.Group()
+  roll.position.set(0.32, 0.72, 0.26)
+  
+  // 银色小置物板/小纸架架子
+  addBox(roll, 0.03, 0.06, 0.14, 0xd4d4d8, [0.08, 0, 0], { roughness: 0.05, metalness: 0.8 })
+  // 缠卷在纸芯上的纯白蓬松卫生卷纸
+  addBox(roll, 0.12, 0.12, 0.11, 0xfafafa, [0, 0, 0], { roughness: 0.85 })
+  // 垂挂下来、在风中自然耷拉下的微薄一小段纸张细节 (太有灵魂了)
+  addBox(roll, 0.005, 0.09, 0.11, 0xfafafa, [-0.06, -0.09, 0], { roughness: 0.85 })
+
+  root.add(roll)
+
+  return root
+}
+
+// ---------------------------------------------------------------------------
+// 7. 其余设备及背景装点 (白板、路由器机架、盆栽、文件柜、现代地板)
+// ---------------------------------------------------------------------------
 export const createWhiteboard = () => {
   const root = new THREE.Group()
-  addBox(root, 1.55, 0.95, 0.08, 0xe8ece9, [0, 1.18, 0])
-  addBox(root, 1.65, 0.08, 0.1, 0x5a6268, [0, 1.68, 0])
-  addBox(root, 1.65, 0.08, 0.1, 0x5a6268, [0, 0.68, 0])
-  addBox(root, 0.12, 0.18, 0.03, 0xf1c94c, [-0.45, 1.23, -0.06])
-  addBox(root, 0.12, 0.18, 0.03, 0x4f9f61, [-0.2, 1.09, -0.06])
-  addBox(root, 0.12, 0.18, 0.03, 0x3578c6, [0.08, 1.3, -0.06])
-  addBox(root, 0.5, 0.04, 0.03, 0x22262a, [0.35, 1.0, -0.06])
-  addBox(root, 0.38, 0.04, 0.03, 0x22262a, [0.3, 1.16, -0.06])
+  // 现代浅灰白板面
+  addBox(root, 1.5, 0.95, 0.04, 0xf8fafc, [0, 1.18, 0], { roughness: 0.1 })
+  // 不锈钢银色包边框
+  addBox(root, 1.54, 0.06, 0.06, 0x71717a, [0, 1.68, 0])
+  addBox(root, 1.54, 0.06, 0.06, 0x71717a, [0, 0.68, 0])
+  
+  // 彩色磁吸立体小便签纸 (拼贴细节)
+  addBox(root, 0.1, 0.14, 0.01, 0xef4444, [-0.4, 1.25, -0.025])
+  addBox(root, 0.1, 0.14, 0.01, 0x10b981, [-0.18, 1.15, -0.025])
+  addBox(root, 0.1, 0.14, 0.01, 0x3b82f6, [0.08, 1.34, -0.025])
+  
+  // 手绘黑色线条小草稿框
+  addBox(root, 0.44, 0.02, 0.01, 0x18181b, [0.38, 1.16, -0.025])
+  addBox(root, 0.32, 0.02, 0.01, 0x18181b, [0.32, 1.05, -0.025])
+  
   return root
 }
 
 export const createRouterRack = () => {
   const root = new THREE.Group()
-  addBox(root, 0.9, 0.24, 0.55, 0x1a1e23, [0, 0.24, 0])
-  addBox(root, 0.08, 0.7, 0.08, 0x0d0e10, [-0.32, 0.74, -0.16])
-  addBox(root, 0.08, 0.7, 0.08, 0x0d0e10, [0.32, 0.74, -0.16])
-  addBox(root, 0.09, 0.06, 0.04, 0x68d391, [-0.26, 0.27, -0.29], { emissive: 0x22c55e, emissiveIntensity: 0.6 })
-  addBox(root, 0.09, 0.06, 0.04, 0x68d391, [-0.1, 0.27, -0.29], { emissive: 0x22c55e, emissiveIntensity: 0.6 })
-  addBox(root, 0.09, 0.06, 0.04, 0xeab308, [0.06, 0.27, -0.29], { emissive: 0xeab308, emissiveIntensity: 0.35 })
+  // 现代曜石黑刀片服务器机箱
+  addBox(root, 0.85, 0.22, 0.5, 0x27272a, [0, 0.22, 0])
+  // 细长不锈钢金属四角托架
+  addBox(root, 0.06, 0.72, 0.06, 0x52525b, [-0.3, 0.72, -0.14])
+  addBox(root, 0.06, 0.72, 0.06, 0x52525b, [0.3, 0.72, -0.14])
+  
+  // 极其精致的自发光指示灯模块 (绿/红/黄发光点，表现网络吞吐和Ops特征)
+  addBox(root, 0.08, 0.05, 0.03, 0x10b981, [-0.24, 0.25, -0.26], { emissive: 0x10b981, emissiveIntensity: 0.9 })
+  addBox(root, 0.08, 0.05, 0.03, 0x10b981, [-0.1, 0.25, -0.26], { emissive: 0x10b981, emissiveIntensity: 0.9 })
+  addBox(root, 0.08, 0.05, 0.03, 0xeab308, [0.04, 0.25, -0.26], { emissive: 0xeab308, emissiveIntensity: 0.8 })
+  addBox(root, 0.08, 0.05, 0.03, 0xef4444, [0.18, 0.25, -0.26], { emissive: 0xef4444, emissiveIntensity: 0.4 })
+  
   return root
 }
 
 export const createPlant = () => {
   const root = new THREE.Group()
-  addBox(root, 0.34, 0.34, 0.34, 0x9a6b3a, [0, 0.17, 0])
-  addBox(root, 0.12, 0.54, 0.12, 0x3f7f32, [0, 0.55, 0])
-  addBox(root, 0.28, 0.18, 0.16, 0x3d9635, [-0.18, 0.75, 0])
-  addBox(root, 0.28, 0.18, 0.16, 0x4ca83e, [0.18, 0.88, 0.02])
-  addBox(root, 0.16, 0.18, 0.28, 0x58b34b, [0.02, 0.98, -0.18])
+  // 极简现代水泥灰几何体花盆
+  addBox(root, 0.32, 0.32, 0.32, 0xe4e4e7, [0, 0.16, 0], { roughness: 0.5 })
+  // 翠绿盆栽植物枝干及体素大片绿叶
+  addBox(root, 0.1, 0.48, 0.1, 0x065f46, [0, 0.5, 0])
+  addBox(root, 0.26, 0.16, 0.24, 0x059669, [-0.14, 0.7, 0.02])
+  addBox(root, 0.24, 0.16, 0.26, 0x10b981, [0.14, 0.82, -0.02])
+  addBox(root, 0.14, 0.14, 0.24, 0x34d399, [0, 0.92, -0.14])
   return root
 }
 
 export const createFileCabinet = () => {
   const root = new THREE.Group()
-  addBox(root, 0.62, 0.9, 0.52, 0xb97c35, [0, 0.45, 0])
-  addBox(root, 0.52, 0.24, 0.04, 0x8b5a26, [0, 0.67, -0.27])
-  addBox(root, 0.52, 0.24, 0.04, 0x8b5a26, [0, 0.36, -0.27])
-  addBox(root, 0.22, 0.04, 0.04, 0x2c2f33, [0, 0.69, -0.3])
-  addBox(root, 0.22, 0.04, 0.04, 0x2c2f33, [0, 0.38, -0.3])
-  addBox(root, 0.12, 0.42, 0.18, 0x275e9b, [-0.16, 1.14, 0])
-  addBox(root, 0.12, 0.42, 0.18, 0xe3b341, [0, 1.14, 0])
-  addBox(root, 0.12, 0.42, 0.18, 0x20252b, [0.16, 1.14, 0])
+  // 暖棕橡木质感文件柜
+  addBox(root, 0.58, 0.88, 0.48, 0xd97706, [0, 0.44, 0])
+  // 抽屉滑道接缝
+  addBox(root, 0.48, 0.22, 0.03, 0xb45309, [0, 0.65, -0.25])
+  addBox(root, 0.48, 0.22, 0.03, 0xb45309, [0, 0.34, -0.25])
+  // 曜石黑抽屉拉手
+  addBox(root, 0.2, 0.03, 0.03, 0x27272a, [0, 0.67, -0.27])
+  addBox(root, 0.2, 0.03, 0.03, 0x27272a, [0, 0.36, -0.27])
+  // 柜顶整齐立放的三本书 (红、黄、黑拼色，表现极高的人文气息)
+  addBox(root, 0.1, 0.4, 0.16, 0x3b82f6, [-0.14, 1.08, 0.02])
+  addBox(root, 0.1, 0.4, 0.16, 0xeab308, [0, 1.08, 0.02])
+  addBox(root, 0.1, 0.4, 0.16, 0x18181b, [0.14, 1.08, 0.02])
+  
   return root
 }
 
+// ---------------------------------------------------------------------------
+// 8. 亮白灰大理石无缝地板构建 (Floor)
+// ---------------------------------------------------------------------------
 export const createFloor = () => {
   const root = new THREE.Group()
-  addBox(root, 7.6, 0.14, 6.4, 0xc9c6b8, [0, -0.07, 0])
+  
+  // 加宽、变长，适应包含生活区与工作区在内的优雅三维画卷 (9.2 x 0.1 x 7.6)
+  const floorColor = 0xf4f4f5 // 亮白浅冷灰
+  addBox(root, 9.2, 0.1, 7.6, floorColor, [0, -0.05, 0], { roughness: 0.3, metalness: 0.02 })
 
-  for (let x = -3; x <= 3; x += 1) {
-    addBox(root, 0.025, 0.012, 6.4, 0x9f9b8d, [x, 0.01, 0])
+  // 极柔和、无喧宾夺主的极淡灰色板块分割线（体现大块大理石地砖的高档感）
+  const gridColor = 0xe4e4e7
+  for (let x = -4; x <= 4; x += 2) {
+    addBox(root, 0.015, 0.008, 7.6, gridColor, [x, 0.005, 0], { roughness: 0.5 })
   }
-  for (let z = -3; z <= 3; z += 1) {
-    addBox(root, 7.6, 0.012, 0.025, 0x9f9b8d, [0, 0.012, z])
+  for (let z = -3; z <= 3; z += 2) {
+    addBox(root, 9.2, 0.008, 0.015, gridColor, [0, 0.005, z], { roughness: 0.5 })
   }
 
   return root
 }
 
+// 清理缓存材质，防内存泄露
 export const disposeSharedMaterials = () => {
   materialCache.forEach((mat) => mat.dispose())
   materialCache.clear()

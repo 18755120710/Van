@@ -6,8 +6,6 @@
         <span>{{ activeRoleName }}</span>
       </div>
 
-      <div class="mc-orbit-hint">拖拽旋转视角</div>
-
       <div class="mc-bubble-layer">
         <div
           v-if="activeAnchor.visible"
@@ -27,6 +25,12 @@
     </div>
   </div>
 </template>
+
+<style scoped>
+:deep(.mc-sandbox-canvas) {
+  cursor: default !important;
+}
+</style>
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
