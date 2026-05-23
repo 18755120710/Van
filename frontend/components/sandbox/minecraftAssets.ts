@@ -489,8 +489,6 @@ export const createWhiteboard = () => {
   addBox(root, 1.54, 0.06, 0.06, 0x71717a, [0, 0.68, 0])
   
   // 彩色磁吸立体小便签纸 (拼贴细节)
-  addBox(root, 0.1, 0.14, 0.01, 0xef4444, [-0.4, 1.25, -0.025])
-  addBox(root, 0.1, 0.14, 0.01, 0x10b981, [-0.18, 1.15, -0.025])
   addBox(root, 0.1, 0.14, 0.01, 0x3b82f6, [0.08, 1.34, -0.025])
   
   // 手绘黑色线条小草稿框
@@ -548,7 +546,7 @@ export const createFileCabinet = () => {
 }
 
 // ---------------------------------------------------------------------------
-// 8. 亮白灰大理石无缝地板构建 (Floor)
+// 8. 亮白大理石无缝大地板与极简背景矮墙构建 (Floor & Walls)
 // ---------------------------------------------------------------------------
 export const createFloor = () => {
   const root = new THREE.Group()
@@ -565,9 +563,10 @@ export const createFloor = () => {
   floorMesh.receiveShadow = true
   root.add(floorMesh)
 
-  // 1. 周围纯白矮墙设计 (Half-wall, 提拔至高度 1.75 米)，带灰色顶盖收边条，完美暴露出墙体厚度与合围空间
+  // 1. 周围纯白矮墙设计 (只保留后背景墙 Z = -3.8，高度 1.75 米，彻底去除了跑步机下方的前侧横挡左矮墙)
   const wallColor = 0xffffff
-  const capColor = 0xd4d4d8 // 优雅的冷灰色收边顶盖板
+  // 珠光白（Pearl White, 极富亮润光泽，通过 0.8 金属度展现尊贵的厚度盖板切口质感）
+  const pearlWhiteMat = createMaterial(0xfafaf6, { roughness: 0.15, metalness: 0.8 })
 
   // 1.1 后侧矮背景墙 (Z = -3.8, 高 1.75, 厚 0.06)
   const backWall = addBox(root, 9.2, 1.75, 0.06, wallColor, [0, 0.875, -3.8], { roughness: 0.95 })
