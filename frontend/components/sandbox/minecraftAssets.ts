@@ -565,34 +565,47 @@ export const createFloor = () => {
   floorMesh.receiveShadow = true
   root.add(floorMesh)
 
-  // 极简纯白墙壁材质
-  const wallMat = createMaterial(0xffffff, { roughness: 0.98, metalness: 0.0 })
+  // 1. 周围纯白矮墙设计 (Half-wall, 高 1.5 米)，具有精致厚度，杜绝阻挡俯瞰视野，具有完美的微缩沙盘感
+  const wallColor = 0xffffff
 
-  // 极简纯白后背景墙 (Z 轴负方向，X 跨度 9.2，高 4.0)，设置为不投射阴影，以保持办公室地面的明亮纯白
-  const backWall = new THREE.Mesh(new THREE.PlaneGeometry(9.2, 4.0), wallMat)
-  backWall.position.set(0, 2.0, -3.8) // 紧贴后边缘
+  // 1.1 后侧矮背景墙 (Z = -3.8)
+  const backWall = addBox(root, 9.2, 1.5, 0.06, wallColor, [0, 0.75, -3.8], { roughness: 0.95 })
+  backWall.castShadow = false // 禁用阴影投射，保持大平地纯白
   backWall.receiveShadow = true
-  backWall.castShadow = false // 彻底杜绝墙体投射巨大三角阴影！
-  root.add(backWall)
+
+  // 1.2 左侧矮背景墙 (X = -4.6)
+  const leftWall = addBox(root, 0.06, 1.5, 7.6, wallColor, [-4.6, 0.75, 0], { roughness: 0.95 })
+  leftWall.castShadow = false // 禁用阴影投射
+  leftWall.receiveShadow = true
 
   // ---------------------------------------------------------------------------
-  // 在后墙上拼接一扇精美高档的办公室大门 (X = 2.0, Z = -3.8)
+  // 2. 在后侧矮墙上集成极致精美的【半透明幽蓝色科技玻璃大门】(X = 1.8)
   // ---------------------------------------------------------------------------
-  const frameColor = 0x3f3f46 // 深灰黑色门框
-  const woodColor = 0xb45309  // 暖胡桃木色门扇
-  const handleColor = 0x18181b // 亮黑色五金把手
+  const frameColor = 0xa1a1aa  // 银灰色高级极细钢架
+  const glassColor = 0xbae6fd  // 半透明清亮幽蓝色玻璃
+  const handleColor = 0xf4f4f5 // 亮银色拉丝不锈钢把手
 
-  // 左右门框及上门框体素
-  addBox(root, 0.04, 1.9, 0.04, frameColor, [2.0 - 0.44, 0.95, -3.76]) // 左门框
-  addBox(root, 0.04, 1.9, 0.04, frameColor, [2.0 + 0.44, 0.95, -3.76]) // 右门框
-  addBox(root, 0.92, 0.04, 0.04, frameColor, [2.0, 1.9, -3.76])       // 上门框
+  // 2.1 极细钢制门框 (高 1.5，刚好与矮墙平齐，完美隐藏边缘)
+  const frameL = addBox(root, 0.03, 1.5, 0.04, frameColor, [1.8 - 0.42, 0.75, -3.76])
+  const frameR = addBox(root, 0.03, 1.5, 0.04, frameColor, [1.8 + 0.42, 0.75, -3.76])
+  const frameT = addBox(root, 0.87, 0.03, 0.04, frameColor, [1.8, 1.5, -3.76])
+  frameL.castShadow = false
+  frameR.castShadow = false
+  frameT.castShadow = false
 
-  // 温暖胡桃木门页
-  addBox(root, 0.84, 1.86, 0.02, woodColor, [2.0, 0.93, -3.77], { roughness: 0.6, metalness: 0.1 })
+  // 2.2 极具科技感的半透明玻璃门板
+  const doorPanel = addBox(root, 0.8, 1.46, 0.015, glassColor, [1.8, 0.73, -3.77], {
+    transparent: true,
+    opacity: 0.52,
+    roughness: 0.1,
+    metalness: 0.8
+  })
+  doorPanel.castShadow = false // 门板不设置阴影，极其明透
+  doorPanel.receiveShadow = true
 
-  // 极细致的极简黑色门锁与横向拉手
-  addBox(root, 0.025, 0.1, 0.03, handleColor, [2.0 + 0.32, 0.9, -3.74]) // 锁扣底板
-  addBox(root, 0.08, 0.02, 0.02, handleColor, [2.0 + 0.28, 0.93, -3.72]) // 横执手手柄
+  // 2.3 极致精致的亮银色圆润大门执手
+  const handle = addBox(root, 0.02, 0.45, 0.02, handleColor, [1.8 + 0.32, 0.75, -3.74], { roughness: 0.1, metalness: 0.9 })
+  handle.castShadow = false
 
   // 极柔和、朦胧的极淡灰色瓷砖板块分割线，限定在核心办公室网格 (9.2 x 7.6) 内，丰富工位区域的现代纹理
   const gridColor = 0xf3f4f6
