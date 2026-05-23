@@ -113,19 +113,32 @@ export class MinecraftSandboxScene {
   }
 
   private buildScene() {
-    // 调高全局透亮的环境光，渲染明净办公室的感官
-    const ambient = new THREE.AmbientLight(0xffffff, 1.3)
+    // 调低全局环境光强，防止过度曝光冲淡阴影，渲染高品质对比明暗
+    const ambient = new THREE.AmbientLight(0xffffff, 0.65)
     this.scene.add(ambient)
 
-    // 精细布置的斜向主光源，渲染柔和立体的软阴影 (SoftShadow)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.15)
-    keyLight.position.set(5.5, 7.5, 3.8)
+    // 精细布置的左上方主平行光源，斜向右下投拉出柔和高档的斜阴影
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.38)
+    keyLight.position.set(-6, 9.2, -5.2)
     keyLight.castShadow = true
-    keyLight.shadow.mapSize.set(1024, 1024)
-    keyLight.shadow.bias = -0.001
+    
+    // 大幅提升阴影贴图分辨率，消除锯齿
+    keyLight.shadow.mapSize.set(2048, 2048)
+    keyLight.shadow.bias = -0.0004
+    keyLight.shadow.radius = 3.2 // 开启平滑高斯软阴影边缘羽化
+    
+    // 收窄正交阴影相机视锥体，最大化阴影贴图像素利用率，提升影子精度
+    const d = 6
+    keyLight.shadow.camera.left = -d
+    keyLight.shadow.camera.right = d
+    keyLight.shadow.camera.top = d
+    keyLight.shadow.camera.bottom = -d
+    keyLight.shadow.camera.near = 0.5
+    keyLight.shadow.camera.far = 22
+    
     this.scene.add(keyLight)
 
-    // 辅助补光源 (带微弱的科技冷蓝，表现现代极客感)
+    // 辅助补光源 (带微弱的科技冷蓝，充当环境漫反射填充光)
     const fillLight = new THREE.PointLight(0xe0f2fe, 0.65, 12)
     fillLight.position.set(-3.2, 2.8, -2.2)
     this.scene.add(fillLight)

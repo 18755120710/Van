@@ -553,12 +553,10 @@ export const createFileCabinet = () => {
 export const createFloor = () => {
   const root = new THREE.Group()
   
-  // 使用超大平面铺满整个镜头视野 (100 * 100)，彻底消灭边缘物理切线和空岛悬浮感
+  // 使用超大平面铺满整个镜头视野 (120 * 120)，配合 100% 漫反射纯白以呈现高级的柔和阴影 (Soft Shadow)
   const floorMat = createMaterial(0xffffff, {
-    roughness: 0.9,
-    metalness: 0.0,
-    emissive: 0xffffff,
-    emissiveIntensity: 0.52 // 自发光强力提亮，完全中和漫反射损耗，完美匹配 #ffffff 背景
+    roughness: 0.95,
+    metalness: 0.0
   })
   
   const floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), floorMat)
@@ -566,6 +564,24 @@ export const createFloor = () => {
   floorMesh.position.y = 0.002 // 极微抬高避开渲染底平面冲突
   floorMesh.receiveShadow = true
   root.add(floorMesh)
+
+  // 极简纯白墙壁材质
+  const wallMat = createMaterial(0xffffff, { roughness: 0.98, metalness: 0.0 })
+
+  // 极简纯白左背景墙 (X 轴负方向，Z 跨度 7.6，高 4.0)
+  const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(7.6, 4.0), wallMat)
+  leftWall.position.set(-4.6, 2.0, 0)
+  leftWall.rotation.y = Math.PI / 2 // 面朝右侧
+  leftWall.receiveShadow = true
+  leftWall.castShadow = true
+  root.add(leftWall)
+
+  // 极简纯白后背景墙 (Z 轴负方向，X 跨度 9.2，高 4.0)
+  const backWall = new THREE.Mesh(new THREE.PlaneGeometry(9.2, 4.0), wallMat)
+  backWall.position.set(0, 2.0, -3.8) // 紧贴后边缘
+  backWall.receiveShadow = true
+  backWall.castShadow = true
+  root.add(backWall)
 
   // 极柔和、朦胧的极淡灰色瓷砖板块分割线，限定在核心办公室网格 (9.2 x 7.6) 内，丰富工位区域的现代纹理
   const gridColor = 0xf3f4f6
