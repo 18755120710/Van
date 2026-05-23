@@ -68,11 +68,11 @@ export class MinecraftSandboxScene {
     this.state = state
     this.onAnchorsChanged = onAnchorsChanged
     this.scene = new THREE.Scene()
-    this.scene.background = null
+    this.scene.background = new THREE.Color(0xf4f4f5)
 
     this.camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100)
     
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
