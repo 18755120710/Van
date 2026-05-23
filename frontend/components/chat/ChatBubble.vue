@@ -25,7 +25,7 @@
             <span class="thinking-dot"></span>
             <span class="thinking-dot"></span>
           </div>
-          <span class="thinking-text">AgentScope 正在规划步骤...</span>
+          <span class="thinking-text">{{ thinkingText }}</span>
         </div>
 
         <!-- 推理主文本流 -->
@@ -146,6 +146,57 @@ const timeStr = ref('')
 onMounted(() => {
   const now = new Date()
   timeStr.value = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+})
+
+// 辅助截断字符串函数，去换行为空格
+const truncateString = (str: string, num: number) => {
+  if (!str) return ''
+  const singleLine = str.replace(/\r?\n|\r/g, ' ')
+  if (singleLine.length <= num) {
+    return singleLine
+  }
+  return singleLine.slice(0, num) + '...'
+}
+
+// 动态展示当前的步骤文字信息
+const thinkingText = computed(() => {
+  if (!props.message.toolResults || props.message.toolResults.length === 0) {
+    return 'AgentScope 正在规划步骤...'
+  }
+
+  // 过滤掉 token_usage 的无关指标记录
+  const validLogs = props.message.toolResults.filter(r => r.eventType !== 'token_usage')
+  if (validLogs.length === 0) {
+    return 'AgentScope 正在规划步骤...'
+  }
+
+  const lastLog = validLogs[validLogs.length - 1]
+
+  switch (lastLog.eventType) {
+    case 'plan':
+      return lastLog.text ? `规划步骤: ${truncateString(lastLog.text, 35)}` : 'AgentScope 正在规划步骤...'
+    case 'agent_call':
+      return `正在调用 Agent: ${lastLog.agentName || '子助手'}...`
+    case 'tool_call':
+      return `正在调用工具: ${lastLog.toolName || '工具'}...`
+    case 'tool_result':
+      return `工具 ${lastLog.toolName || '执行'} 已返回结果，正在处理...`
+    case 'status':
+      return lastLog.text ? lastLog.text : '正在更新状态...'
+    case 'error':
+      return `执行遇到错误: ${truncateString(lastLog.text, 35)}`
+    case 'stopped':
+      return '执行已停止'
+    default:
+      if (lastLog.toolName) {
+        return `正在执行 ${lastLog.toolName}...`
+      } else if (lastLog.agentName) {
+        return `${lastLog.agentName} 正在处理...`
+      } else if (lastLog.text) {
+        return truncateString(lastLog.text, 35)
+      }
+      return 'AgentScope 正在规划步骤...'
+  }
 })
 
 // Token usage parsing and display logic
