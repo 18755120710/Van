@@ -554,11 +554,11 @@ export const createFloor = () => {
   const root = new THREE.Group()
   
   // 加宽、变长，适应包含生活区与工作区在内的优雅三维画卷 (9.2 x 0.1 x 7.6)
-  const floorColor = 0xf4f4f5 // 亮白浅冷灰
+  const floorColor = 0xffffff // 极简纯白
   addBox(root, 9.2, 0.1, 7.6, floorColor, [0, -0.05, 0], { roughness: 0.3, metalness: 0.02 })
 
   // 极柔和、无喧宾夺主的极淡灰色板块分割线（体现大块大理石地砖的高档感）
-  const gridColor = 0xe4e4e7
+  const gridColor = 0xf3f4f6
   for (let x = -4; x <= 4; x += 2) {
     addBox(root, 0.015, 0.008, 7.6, gridColor, [x, 0.005, 0], { roughness: 0.5 })
   }

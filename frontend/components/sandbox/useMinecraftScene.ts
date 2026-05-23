@@ -68,7 +68,7 @@ export class MinecraftSandboxScene {
     this.state = state
     this.onAnchorsChanged = onAnchorsChanged
     this.scene = new THREE.Scene()
-    this.scene.background = new THREE.Color(0xf4f4f5)
+    this.scene.background = new THREE.Color(0xffffff)
 
     this.camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100)
     
