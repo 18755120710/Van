@@ -565,24 +565,14 @@ export const createFloor = () => {
 
   // 1. 周围纯白矮墙设计 (只保留后背景墙 Z = -3.8，高度 1.75 米，彻底去除了跑步机下方的前侧横挡左矮墙)
   const wallColor = 0xffffff
-  // 珠光白（Pearl White, 极富亮润光泽，通过 0.8 金属度展现尊贵的厚度盖板切口质感）
-  const pearlWhiteMat = createMaterial(0xfafaf6, { roughness: 0.15, metalness: 0.8 })
 
   // 1.1 后侧矮背景墙 (Z = -3.8, 高 1.75, 厚 0.06)
   const backWall = addBox(root, 9.2, 1.75, 0.06, wallColor, [0, 0.875, -3.8], { roughness: 0.95 })
   backWall.castShadow = false // 禁用阴影，保持大平地洁净
   backWall.receiveShadow = true
-  // 后墙顶部冷灰色盖板 (突出墙面 0.02 宽表现精致厚度)
-  const backCap = addBox(root, 9.22, 0.02, 0.08, capColor, [0, 1.76, -3.8])
+  // 后墙顶部珠光白盖板 (突出墙面 0.02 宽表现精致厚度，采用高反射珠光白)
+  const backCap = addBox(root, 9.22, 0.02, 0.08, 0xfafaf6, [0, 1.76, -3.8], { roughness: 0.15, metalness: 0.8 })
   backCap.castShadow = false
-
-  // 1.2 左侧矮背景墙 (内缩至 X = -3.7 处，完美贴合生活区边缘防道具遮挡，高 1.75, 厚 0.06)
-  const leftWall = addBox(root, 0.06, 1.75, 7.6, wallColor, [-3.7, 0.875, 0], { roughness: 0.95 })
-  leftWall.castShadow = false // 禁用阴影
-  leftWall.receiveShadow = true
-  // 左墙顶部冷灰色盖板
-  const leftCap = addBox(root, 0.08, 0.02, 7.62, capColor, [-3.7, 1.76, 0])
-  leftCap.castShadow = false
 
   // ---------------------------------------------------------------------------
   // 2. 在后侧矮墙上集成极致精美的【半透明幽蓝色科技玻璃大门】(X = 1.8, 高度 1.5 米隐于墙下)
