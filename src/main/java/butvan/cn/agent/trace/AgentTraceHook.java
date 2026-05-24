@@ -16,6 +16,7 @@ public class AgentTraceHook implements Hook {
 
     private final MessageSession session;
 
+
     /**
      * 当前用户问题对应的一次执行 ID
      *
